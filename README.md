@@ -41,8 +41,16 @@ Relance la même commande pour mettre à jour après un changement sur le GitHub
 |---|---|---|
 | Têtes 1 à 4 | Chauvet Intimidator Spot 260X — 14 Channel | 1, 15, 29, 43 |
 | PAR 1 à 4 (gauche → droite) | Blizzard Lighting Hotbox EXA — 11 Channel Mode | 66, 77, 88, 99 |
+| M1 à M4 : contre-jours au fond de la scène (gauche → droite) | MOSFiATA PAR-36 → Generic RGB, mode RGB (**3 canaux**) | 110, 113, 116, 119 |
+| M5 face gauche · M6 face droite (coins avant de la scène) | MOSFiATA PAR-36 → Generic RGB (3 canaux) | 122, 125 |
+| M7 · M8 : public, mur gauche (avant · arrière) | MOSFiATA PAR-36 → Generic RGB (3 canaux) | 128, 131 |
+| U1 face gauche · U2 face droite (bord de scène) | U`King 18x10W RGBW → Generic RGBW, mode RGBW (**4 canaux**, menu `d001`) | 134, 138 |
 
-Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
+- Sur chaque Hotbox : menu → mode **11CH** et l'adresse de la table.
+- Les MOSFiATA et les U`King sont en mode couleurs seulement. Les fixtures Generic sont inclus dans QLC+ : rien à installer. Le strobe de ces PAR est fait par QLC+ (clignotement).
+- **M7 et M8 éclairent le public** : ils restent éteints dans les couleurs et les looks, et ne s'allument qu'avec le blinder, les strobes, les bumps et les flashs.
+- Toutes les couleurs du show (ambre, blanc chaud, UV…) sont converties automatiquement en RGB ou RGBW.
+- À vérifier à la réception : dans le manuel MOSFiATA, le mode 3 canaux doit être rouge, vert, bleu dans cet ordre. Sinon, change `MOS_MODEL` dans `tools/generate_show.py` (ex. mode `GRB`).
 
 ## Comment jouer
 1. **Choisis un LOOK** dans les 3 rangées du haut (30 looks) : tout le rig change d'un coup, avec des fondus.

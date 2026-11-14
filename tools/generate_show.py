@@ -19,6 +19,18 @@ HEAD_MODEL = ("Chauvet", "Intimidator Spot 260X", "14 Channel", 14)
 HEAD_ADDR = [1, 15, 29, 43]
 PAR_MODEL = ("Blizzard Lighting", "Hotbox EXA", "11 Channel Mode", 11)
 PAR_FIRST, PAR_COUNT = 66, 4
+# PAR ajoutés, en mode « couleurs seulement » (fixtures Generic inclus dans QLC+, rien à installer)
+MOS_MODEL = ("Generic", "Generic RGB", "RGB", 3)      # MOSFiATA PAR-36 (36 LED RGB), mode 3 canaux
+UK_MODEL = ("Generic", "Generic RGBW", "RGBW", 4)     # U`King 18x10W RGBW, mode 4 canaux (d001)
+# D'après le plan de la salle (x : 0 = gauche de la scène, 1 = droite, vu du public)
+MOS = [  # nom, adresse, x, rôle
+    ("M1 contre", 110, 0.10, "back"), ("M2 contre", 113, 0.30, "back"),
+    ("M3 contre", 116, 0.61, "back"), ("M4 contre", 119, 0.80, "back"),
+    ("M5 face G", 122, 0.00, "front"), ("M6 face D", 125, 1.00, "front"),
+    ("M7 public", 128, -0.05, "crowd"), ("M8 public", 131, -0.04, "crowd"),
+]
+UK = [("U1 face", 134, 0.33, "front"), ("U2 face", 138, 0.63, "front")]
+POS_HOTBOX = [0.2, 0.4, 0.6, 0.8]
 
 # Canaux (index 0-based dans le mode)
 H_PAN, H_PANF, H_TILT, H_TILTF, H_SPEED, H_COLOR, H_GOBO, H_GROT, H_PRISM, H_FOCUS, \
@@ -31,9 +43,23 @@ fixtures = []          # (id, name, model, addr0)
 for i, a in enumerate(HEAD_ADDR):
     fixtures.append((len(fixtures), f"Tête {i + 1}", HEAD_MODEL, a - 1))
 HEADS = [f[0] for f in fixtures]
+XPOS = {}
 for i in range(PAR_COUNT):
+    XPOS[len(fixtures)] = POS_HOTBOX[i]
     fixtures.append((len(fixtures), f"PAR {i + 1}", PAR_MODEL, PAR_FIRST - 1 + i * PAR_MODEL[3]))
-PARS = [f[0] for f in fixtures if f[2] is PAR_MODEL]
+HOTBOX = [f[0] for f in fixtures if f[2] is PAR_MODEL]
+ROLE = {}
+for model, lst in ((MOS_MODEL, MOS), (UK_MODEL, UK)):
+    for name, a, x, role in lst:
+        XPOS[len(fixtures)], ROLE[len(fixtures)] = x, role
+        fixtures.append((len(fixtures), name, model, a - 1))
+RGB_PARS = {f[0]: f[2][3] for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}   # id -> 3 (RGB) / 4 (RGBW)
+PARS = sorted(XPOS, key=lambda f: XPOS[f])          # tous les PAR, de gauche à droite
+CROWD = [p for p in PARS if ROLE.get(p) == "crowd"]  # éclairent le public : seulement dans les flashs
+BACK = [p for p in PARS if ROLE.get(p) == "back"]
+STAGE = [p for p in PARS if p not in CROWD]          # couleurs, effets, vagues
+LEFT = [p for p in PARS if XPOS[p] < 0.5]
+RIGHT = [p for p in PARS if XPOS[p] >= 0.5]
 
 # ---------------------------------------------------------------- Helpers
 ws = ET.Element("Workspace", {"xmlns": "http://www.qlcplus.org/Workspace",
@@ -64,7 +90,7 @@ def group(gid, name, members):
 
 
 G_PAR, G_HEADS = 0, 1
-group(G_PAR, "PAR (gauche → droite)", PARS)
+group(G_PAR, "PAR scène (gauche → droite)", STAGE)
 group(G_HEADS, "Têtes", HEADS)
 
 _fid = [0]
@@ -77,12 +103,29 @@ def new_func(ftype, name, path):
     return f, _fid[0] - 1
 
 
+def rgbify(chans, nch):
+    """Convertit des valeurs Hotbox (R G B Ambre Blanc UV) pour un PAR RGB (3) ou RGBW (4)."""
+    keys = (P_R, P_G, P_B, P_A, P_W, P_UV)
+    if not any(k in chans for k in keys):
+        return {}
+    r, g, b, a, w, uv = (chans.get(k, 0) for k in keys)
+    if nch == 4:
+        out = [r + a + uv * .3, g + a * .45, b + uv * .6, w]
+    else:
+        out = [r + a + w * .9 + uv * .3, g + a * .45 + w * .8, b + w * .7 + uv * .6]
+    return {i: min(255, int(round(v))) for i, v in enumerate(out)}
+
+
 def scene(name, path, values, fade_in=0, fade_out=0):
-    """values: {fixture_id: {channel: value}}"""
+    """values: {fixture_id: {channel: value}} (valeurs Hotbox, converties pour les PAR RGB/RGBW)"""
     f, fid = new_func("Scene", name, path)
     ET.SubElement(f, "Speed", {"FadeIn": str(fade_in), "FadeOut": str(fade_out), "Duration": "0"})
     for fx in sorted(values):
         chans = values[fx]
+        if fx in RGB_PARS:
+            chans = rgbify(chans, RGB_PARS[fx])
+            if not chans:
+                continue
         txt = ",".join(f"{c},{v}" for c, v in sorted(chans.items()))
         ET.SubElement(f, "FixtureVal", {"ID": str(fx)}).text = txt
     return fid
@@ -114,6 +157,10 @@ def kick(name, scene_id, hold=None, fade_out=None):
     ET.SubElement(f, "SpeedModes", {"FadeIn": "Common", "FadeOut": "Common", "Duration": "Common"})
     ET.SubElement(f, "Step", {"Number": "0", "FadeIn": "0", "Hold": "0", "FadeOut": "0"}).text = str(scene_id)
     return fid
+
+
+def full(pars, chans):
+    return {p: dict(chans) for p in pars}
 
 
 def collection(name, path, members):
@@ -171,7 +218,7 @@ def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 
 # ou un bouton s'arrête. BASE tourne en permanence (démarrage auto + dans chaque look) et
 # fournit la valeur de repli : strobe PAR fermé, prisme off, rotation off, shutter têtes fermé.
 base = scene("BASE (toujours active)", "Système",
-             {**{p: {P_STROBE: 0, P_PROG: 0, P_SPEED: 0, P_32B: 0} for p in PARS},
+             {**{p: {P_STROBE: 0, P_PROG: 0, P_SPEED: 0, P_32B: 0} for p in HOTBOX},
               **{h: {H_STROBE: 0, H_PRISM: 0, H_GROT: 0, H_FUNC: 0, H_MACRO: 0} for h in HEADS}})
 engine.set("Autostart", str(base))
 
@@ -199,23 +246,23 @@ PC = {n: c for n, c, _ in PAR_COLORS}
 par_color_ids = {}
 for name, c, _ in PAR_COLORS:
     par_color_ids[name] = scene(f"PAR {name}", "PAR/Couleurs",
-                                {p: {**dict(zip(CH6, c)), P_STROBE: 0} for p in PARS}, COLOR_FADE, COLOR_FADE)
+                                {p: {**dict(zip(CH6, c)), P_STROBE: 0} for p in STAGE}, COLOR_FADE, COLOR_FADE)
 
 
 def split(name, c1, c2):
     a, b = dict(zip(CH6, PC[c1])), dict(zip(CH6, PC[c2]))
     return scene(f"PAR {name}", "PAR/Couleurs",
-                 {p: (a if i % 2 == 0 else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
+                 {p: (a if i % 2 == 0 else b) for i, p in enumerate(STAGE)}, COLOR_FADE, COLOR_FADE)
 
 
-EDGE = max(1, len(PARS) // 4)
+EDGE = max(1, len(STAGE) // 4)
 
 
 def sides(name, c_out, c_in):
     """extérieur / centre : PAR des bords vs ceux du milieu"""
     a, b = dict(zip(CH6, PC[c_out])), dict(zip(CH6, PC[c_in]))
     return scene(f"PAR {name}", "PAR/Couleurs",
-                 {p: (a if i < EDGE or i >= len(PARS) - EDGE else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
+                 {p: (a if i < EDGE or i >= len(STAGE) - EDGE else b) for i, p in enumerate(STAGE)}, COLOR_FADE, COLOR_FADE)
 
 
 SPLITS = [
@@ -255,18 +302,18 @@ TEMPO_FX = [FX[k] for k in ("Vague rouge", "Vague bleue", "Pair / Impair", "Alte
                             "Un par un", "Remplir centre", "Chase couleurs")]
 
 # Flash
-strobe_par = scene("PAR Strobe blanc", "PAR/Flash",
-                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in PARS})
+_strobe_hb = scene("PAR Strobe blanc (Hotbox)", "PAR/Flash",
+                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in HOTBOX})
+# les PAR RGB n'ont pas de canal strobe : on clignote blanc / noir
+_rgb_on = scene("PAR RGB blanc", "PAR/Flash", full(RGB_PARS, {P_R: 255, P_G: 255, P_B: 255, P_W: 255}))
+_rgb_off = scene("PAR RGB noir", "PAR/Flash", full(RGB_PARS, {P_R: 0, P_G: 0, P_B: 0, P_W: 0}))
+strobe_par = collection("PAR Strobe blanc", "PAR/Flash",
+                        [_strobe_hb, chaser("PAR RGB strobe", "PAR/Flash", [_rgb_on, _rgb_off], hold=45)])
 blinder = scene("PAR Blinder", "PAR/Flash",
                 {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255} for p in PARS})
-def full(pars, chans):
-    return {p: dict(chans) for p in pars}
-
-
 WHITE = {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255}
-HALF = len(PARS) // 2
-bump_left = scene("PAR Bump gauche", "PAR/Flash", full(PARS[:HALF], WHITE))
-bump_right = scene("PAR Bump droite", "PAR/Flash", full(PARS[HALF:], WHITE))
+bump_left = scene("PAR Bump gauche", "PAR/Flash", full(LEFT, WHITE))
+bump_right = scene("PAR Bump droite", "PAR/Flash", full(RIGHT, WHITE))
 flash_red = scene("PAR Flash rouge", "PAR/Flash", full(PARS, {P_DIM: 255, P_R: 255}))
 flash_blue = scene("PAR Flash bleu", "PAR/Flash", full(PARS, {P_DIM: 255, P_B: 255, P_UV: 120}))
 flash_uv = scene("PAR Flash UV", "PAR/Flash", full(PARS, {P_DIM: 255, P_UV: 255}))
@@ -564,7 +611,7 @@ grid(f, [(n, fid, 0x3A3A3A) for n, fid in FX.items()], cols=5, w=122, h=60, keys
 
 # --- Masters / tempo / flash
 f = frame(root, "MASTERS & TEMPO", 10, 708, 670, 270)
-level_slider(f, "PAR", [(p, P_DIM) for p in PARS], 15, 35, h=225)
+level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX], 15, 35, h=225)
 level_slider(f, "TÊTES", [(h, H_DIM) for h in HEADS], 115, 35, h=225)
 sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO — tape le beat", "ID": wid()})
 winstate(sd, 220, 35, 230, 225)
