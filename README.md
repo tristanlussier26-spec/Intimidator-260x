@@ -86,10 +86,13 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 Certains canaux (strobe des PAR, prisme, rotation de gobo, shutter des têtes) gardent leur dernière valeur quand un flash ou un bouton s'arrête. La scène **BASE (toujours active)** démarre toute seule en mode show et fait partie de chaque look : elle remet ces canaux à zéro dès qu'un flash est relâché.
 Après un **FONDU AU NOIR**, relance un look avant d'utiliser les flashs (le fondu arrête aussi BASE).
 
-## À ajuster sur place
-- **Positions** : les valeurs pan/tilt sont des points de départ. Dans **Functions → Têtes/Positions**, ouvre la scène et ajuste les têtes pendant qu'elles sont allumées.
-- **Ordre des têtes** : le show suppose que Tête 1 (adresse 1) est à gauche. Sinon, change l'adresse dans **Fixtures**.
-- **Lekos** : pas encore dans le show. Il faut ajouter leurs adresses.
+## Positions des têtes
+Les 8 positions sont **calculées à partir du plan de la salle** (têtes en ligne au-dessus du public, Tête 1 près de la scène) :
+- têtes à **11 pi** du sol et scène à **2 pi** (valeurs supposées : `H_LIGHTS` et `H_STAGE` dans `tools/generate_show.py`) ;
+- sens du pan vérifié dans la salle (`PAN_SIGN = -1`).
+
+## Lekos
+Pas encore dans le show : il faut ajouter leurs adresses.
 
 ## Regénérer le show
 ```

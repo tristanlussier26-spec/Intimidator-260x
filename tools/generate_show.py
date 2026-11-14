@@ -288,7 +288,7 @@ strobe_heads = scene("Têtes Strobe", "Têtes/FX",
 PX_PER_FT = 27.25                     # 1 carré = 54,5 px = 2 pi
 H_LIGHTS = 11.0                       # hauteur des têtes (pi) — à confirmer
 H_STAGE = 2.0                         # hauteur de la scène (pi) — à confirmer
-PAN_SIGN = 1                          # mettre -1 si « Band » vise le fond de la salle au lieu de la scène
+PAN_SIGN = -1                         # inversé : confirmé dans la salle (Band visait le fond)
 PAN_DEG, TILT_DEG = 540.0, 234.0      # plages de la 260X
 HEAD_PX = [(588, 1262), (584, 1418), (583, 1595), (578, 1742)]   # Tête 1 (près de la scène) → Tête 4
 SPOT = {  # cibles (x px, y px, hauteur pi)
