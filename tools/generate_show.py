@@ -217,6 +217,9 @@ FX = {
 FX["Chase couleurs"] = chaser("PAR Chase couleurs", "PAR/Effets",
                               [par_color_ids[c] for c in ("Rouge", "Bleu", "Ambre", "Magenta")],
                               fade=150)
+FX["Fondu lent"] = chaser("PAR Fondu lent", "PAR/Effets",
+                          [par_color_ids[c] for c in ("Rouge", "Ambre", "Mauve", "Bleu nuit", "Cyan", "Magenta")],
+                          hold=3000, fade=2000)
 # effets qui suivent le tempo (1 pas = 1 temps)
 TEMPO_FX = [FX[k] for k in ("Vague rouge", "Vague bleue", "Pair / Impair", "Alterné ambre/bleu",
                             "Un par un", "Remplir centre", "Chase couleurs")]
@@ -226,6 +229,16 @@ strobe_par = scene("PAR Strobe blanc", "PAR/Flash",
                    {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in PARS})
 blinder = scene("PAR Blinder", "PAR/Flash",
                 {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255} for p in PARS})
+def full(pars, chans):
+    return {p: dict(chans) for p in pars}
+
+
+WHITE = {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255}
+bump_left = scene("PAR Bump gauche", "PAR/Flash", full(PARS[:6], WHITE))
+bump_right = scene("PAR Bump droite", "PAR/Flash", full(PARS[6:], WHITE))
+flash_red = scene("PAR Flash rouge", "PAR/Flash", full(PARS, {P_DIM: 255, P_R: 255}))
+flash_blue = scene("PAR Flash bleu", "PAR/Flash", full(PARS, {P_DIM: 255, P_B: 255, P_UV: 120}))
+flash_uv = scene("PAR Flash UV", "PAR/Flash", full(PARS, {P_DIM: 255, P_UV: 255}))
 strobe_rand = matrix("PAR Strobe aléatoire", "Random Single", 0xFFFFFF, duration=40)
 
 # ================================================================ Têtes
@@ -247,6 +260,12 @@ for name, val in GOBOS:
                         for h in HEADS})
 gobo_rot = scene("Têtes Rotation gobo", "Têtes/FX", {h: {H_GROT: 40} for h in HEADS})
 gobo_rot_fast = scene("Têtes Rotation rapide", "Têtes/FX", {h: {H_GROT: 100} for h in HEADS})
+head_chase_col = chaser("Têtes Chase couleurs", "Têtes/FX",
+                        [head_color[c] for c in ("Rouge", "Bleu", "Vert", "Magenta", "Jaune", "Cyan")])
+head_chase_gobo = chaser("Têtes Chase gobos", "Têtes/FX", [gobo[f"Gobo {i}"] for i in range(1, 8)])
+TEMPO_FX += [head_chase_col, head_chase_gobo]
+flash_heads = scene("Têtes Flash blanc", "Têtes/FX",
+                    {h: {H_DIM: 255, H_COLOR: 3, H_GOBO: 3, H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
 prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
                      {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
@@ -301,7 +320,36 @@ LOOKS = [  # nom, couleur bouton, [fonctions]
     ("FINAL", 0xFFF0D0, [par_color_ids["Blanc chaud"], head_color["Blanc"], gobo["Ouvert"],
                          pos["Public"]]),
 ]
+SPLIT_IDS = {n: i for n, i, _ in SPLITS}
+LOOKS2 = [
+    ("OUVERTURE", 0xE0F0FF, [par_color_ids["Blanc froid"], head_color["Blanc"], gobo["Ouvert"],
+                             pos["Public"], MOVES["Balayage lent"]]),
+    ("FEU", 0xFF5000, [FX["Remplir centre"], head_color["Orange"], gobo["Gobo 4"], gobo_rot,
+                       pos["Band"], MOVES["Vague tilt"]]),
+    ("OCÉAN", 0x0080C0, [FX["Vague bleue"], head_color["Cyan"], gobo["Gobo 2"], gobo_rot,
+                         pos["Public"], MOVES["Balayage lent"]]),
+    ("DISCO", 0xE020C0, [FX["Chase couleurs"], head_chase_col, gobo["Gobo 7"], prism,
+                         pos["Plafond"], MOVES["Cercle"]]),
+    ("SOMBRE", 0x400A90, [par_color_ids["UV"], head_color["Bleu"], gobo["Gobo 5"], prism,
+                          pos["Band"], MOVES["Balayage lent"]]),
+    ("ROCK BLANC", 0xC8D8F0, [par_color_ids["Blanc froid"], head_color["Blanc"], gobo["Gobo 1"],
+                              pos["Croisé"], MOVES["Huit"]]),
+    ("ACOUSTIQUE", 0xFFDDB0, [SPLIT_IDS["Bords bleus"], head_color["CTO"], gobo["Ouvert"],
+                              pos["Chanteur"]]),
+    ("MONTÉE", 0xFFB800, [FX["Un par un"], head_color["Jaune"], gobo["Gobo 3"], gobo_rot_fast,
+                          pos["Éventail"], MOVES["Vague tilt"]]),
+    ("CHAOS", 0xB01010, [FX["Pair / Impair"], head_chase_col, head_chase_gobo, prism,
+                         pos["V inversé"], MOVES["Ballyhoo"]]),
+    ("APOTHÉOSE", 0xFFF0D0, [FX["Arc-en-ciel"], head_color["Blanc"], gobo["Ouvert"], prism,
+                             pos["Éventail"], MOVES["Ballyhoo"]]),
+]
 look_ids = [(n, bg, collection(f"LOOK {n}", "Looks", m)) for n, bg, m in LOOKS]
+look2_ids = [(n, bg, collection(f"LOOK {n}", "Looks", m)) for n, bg, m in LOOKS2]
+_all_looks = dict((n, i) for n, _, i in look_ids + look2_ids)
+auto_mode = chaser("AUTO — enchaîne les looks", "Looks",
+                   [_all_looks[n] for n in ("COUPLET", "PRÉ-REFRAIN", "REFRAIN", "GROS REFRAIN", "FEU",
+                                            "OCÉAN", "ÉNERGIE", "DISCO", "ROCK BLANC", "MONTÉE",
+                                            "CHAOS", "PSYCHÉ")], hold=8000)
 
 # ================================================================ Virtual Console
 vc = ET.SubElement(ws, "VirtualConsole")
@@ -327,7 +375,7 @@ def winstate(parent, x, y, w, h):
                                           "Width": str(w), "Height": str(h)})
 
 
-def frame(parent, caption, x, y, w, h, solo=False, bg=0x202020):
+def frame(parent, caption, x, y, w, h, solo=False, bg=0x202020, pages=1):
     f = ET.SubElement(parent, "SoloFrame" if solo else "Frame", {"Caption": caption, "ID": wid()})
     appearance(f, bg=bg, style="Sunken")
     winstate(f, x, y, w, h)
@@ -338,6 +386,9 @@ def frame(parent, caption, x, y, w, h, solo=False, bg=0x202020):
         ET.SubElement(f, "Mixing").text = "False"
     ET.SubElement(f, "Collapsed").text = "False"
     ET.SubElement(f, "Disabled").text = "False"
+    if pages > 1:
+        ET.SubElement(f, "Multipage", {"PagesNum": str(pages), "CurrentPage": "0"})
+        ET.SubElement(f, "PagesLoop").text = "True"
     return f
 
 
@@ -350,8 +401,11 @@ BOLD = "Sans Serif,11,-1,5,75,0,0,0,0,0"
 BIG = "Sans Serif,13,-1,5,75,0,0,0,0,0"
 
 
-def button(parent, caption, fid, x, y, w=100, h=64, action="Toggle", bg=None, key=None, font=None):
+def button(parent, caption, fid, x, y, w=100, h=64, action="Toggle", bg=None, key=None, font=None,
+           page=0):
     b = ET.SubElement(parent, "Button", {"Caption": caption, "ID": wid(), "Icon": ""})
+    if page:
+        b.set("Page", str(page))
     winstate(b, x, y, w, h)
     appearance(b, bg=bg, fg=text_color_for(bg) if bg is not None else None, font=font)
     ET.SubElement(b, "Function", {"ID": str(fid)})
@@ -362,10 +416,12 @@ def button(parent, caption, fid, x, y, w=100, h=64, action="Toggle", bg=None, ke
     return b
 
 
-def grid(parent, items, cols, w=100, h=64, gap=8, top=35, left=10, action="Toggle", font=None):
+def grid(parent, items, cols, w=100, h=64, gap=8, top=35, left=10, action="Toggle", font=None, page=0,
+         keys=None):
     for i, (cap, fid, bg) in enumerate(items):
         r, c = divmod(i, cols)
-        button(parent, cap, fid, left + c * (w + gap), top + r * (h + gap), w, h, action, bg, font=font)
+        button(parent, cap, fid, left + c * (w + gap), top + r * (h + gap), w, h, action, bg,
+               key=keys[i] if keys else None, font=font, page=page)
 
 
 def level_slider(parent, caption, channels, x, y, w=90, h=250, value=255):
@@ -387,8 +443,11 @@ root = ET.SubElement(vc, "Frame", {"Caption": ""})
 appearance(root, bg=0x121212)
 
 # --- Rangée 1 : LOOKS
-f = frame(root, "LOOKS DU SHOW — un bouton = tout le rig", 10, 10, 1840, 125, solo=True, bg=0x2A1010)
-grid(f, [(n, fid, bg) for n, bg, fid in look_ids], cols=10, w=174, h=80, font=BIG)
+f = frame(root, "LOOKS DU SHOW — un bouton = tout le rig  (flèches = page 2)", 10, 10, 1840, 125,
+          solo=True, bg=0x2A1010, pages=2)
+for pg, ids in ((0, look_ids), (1, look2_ids)):
+    grid(f, [(n, fid, bg) for n, bg, fid in ids] + [("▶ AUTO", auto_mode, 0x00A060)],
+         cols=11, w=158, h=80, font=BIG, page=pg)
 
 # --- PAR
 f = frame(root, "PAR — COULEURS", 10, 145, 670, 255, solo=True)
@@ -410,6 +469,8 @@ for fid_ in TEMPO_FX:
     ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "6"}).text = str(fid_)
 for k in ("Cercle", "Huit", "Diamant"):  # 1 tour = 8 temps
     ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "9"}).text = str(MOVES[k])
+# mode auto : 1 look = 16 temps
+ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "10"}).text = str(auto_mode)
 button(f, "STROBE\nPAR", strobe_par, 465, 35, 95, 80, "Flash", 0xFFFFFF, "S", BOLD)
 button(f, "BLINDER", blinder, 568, 35, 95, 80, "Flash", 0xFFE070, "B", BOLD)
 button(f, "STROBE TÊTES", strobe_heads, 465, 123, 95, 80, "Flash", 0xC8C8C8, "D", BOLD)
@@ -425,7 +486,8 @@ f = frame(root, "TÊTES — GOBO", 690, 330, 560, 175, solo=True)
 grid(f, [(n, gobo[n], 0x303058) for n, _ in GOBOS], cols=5)
 f = frame(root, "TÊTES — FX", 690, 515, 560, 110)
 grid(f, [("Rotation gobo", gobo_rot, 0x2F5A2F), ("Rotation rapide", gobo_rot_fast, 0x2F5A2F),
-         ("Prisme", prism, 0x2F5A2F)], cols=5)
+         ("Prisme", prism, 0x2F5A2F), ("Chase couleurs", head_chase_col, 0x2F5A2F),
+         ("Chase gobos", head_chase_gobo, 0x2F5A2F)], cols=5)
 
 f = frame(root, "TÊTES — POSITION (fondu 1,2 s)", 1260, 145, 590, 175, solo=True)
 grid(f, [(n, pos[n], 0x204060) for n, _ in POSITIONS], cols=5, w=106)
@@ -444,16 +506,23 @@ ET.SubElement(xy, "Tilt", {"Position": "127"})
 f = frame(root, "TÊTES — MOUVEMENT", 1560, 330, 290, 295, solo=True)
 grid(f, [(n, i, 0x5A2A5A) for n, i in MOVES.items()], cols=2, w=130, h=72)
 
-f = frame(root, "AIDE", 690, 635, 1160, 265, bg=0x181818)
+f = frame(root, "FLASH & BUMPS (maintenir)", 690, 635, 560, 265)
+grid(f, [("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xFFFFFF),
+         ("FLASH\nROUGE", flash_red, 0xE01010), ("FLASH\nBLEU", flash_blue, 0x1030E0),
+         ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
+     cols=3, w=172, h=104, action="Flash", font=BIG, keys=["1", "2", "3", "4", "5", "6"])
+
+f = frame(root, "AIDE", 1260, 635, 590, 265, bg=0x181818)
 lab = ET.SubElement(f, "Label", {"Caption": (
-    "1. Choisis un LOOK en haut → tout le rig change avec des fondus.\n"
-    "2. Raffine en live : une couleur PAR, un gobo ou une position par-dessus le look.\n"
-    "3. Tape le beat sur TEMPO : les effets PAR et les mouvements suivent la toune.\n"
-    "4. Flash en maintenant : S strobe PAR · B blinder · D strobe têtes · F strobe fou.\n"
-    "5. Fin de toune : FONDU AU NOIR (N) ou BLACKOUT (X).\n"
-    "Les mouvements bougent autour de la position active : garde toujours une position allumée."),
+    "1. Choisis un LOOK (page 2 avec les flèches)\n"
+    "   ou ▶ AUTO : les looks changent aux 16 temps.\n"
+    "2. Raffine : couleur, gobo, position par-dessus.\n"
+    "3. Tape le beat sur TEMPO.\n"
+    "4. Flash : S B D F · bumps 1 à 6\n"
+    "5. Fin de toune : FONDU AU NOIR (N) · BLACKOUT (X)\n"
+    "Garde toujours une position allumée."),
     "ID": wid()})
-winstate(lab, 10, 35, 1140, 220)
+winstate(lab, 10, 35, 570, 220)
 appearance(lab, fg=0xDDDDDD, font=BOLD)
 
 props = ET.SubElement(vc, "Properties")
