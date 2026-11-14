@@ -283,18 +283,62 @@ prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
                      {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
 
-# Positions : (pan, tilt) par tête, de gauche à droite. Points de départ à ajuster sur place.
+# Positions calculées à partir du plan de la salle (vu du plafond, 1 carré = 2 pi).
+# Coordonnées en pixels de la capture du plan : x vers la droite (côté guitare), y vers le fond de la salle.
+PX_PER_FT = 27.25                     # 1 carré = 54,5 px = 2 pi
+H_LIGHTS = 11.0                       # hauteur des têtes (pi) — à confirmer
+H_STAGE = 2.0                         # hauteur de la scène (pi) — à confirmer
+PAN_SIGN = 1                          # mettre -1 si « Band » vise le fond de la salle au lieu de la scène
+PAN_DEG, TILT_DEG = 540.0, 234.0      # plages de la 260X
+HEAD_PX = [(588, 1262), (584, 1418), (583, 1595), (578, 1742)]   # Tête 1 (près de la scène) → Tête 4
+SPOT = {  # cibles (x px, y px, hauteur pi)
+    "chanteur": (600, 1000, H_STAGE + 5), "batterie": (600, 783, H_STAGE + 3.5),
+    "basse": (382, 865, H_STAGE + 4.5), "guitare": (818, 865, H_STAGE + 4.5),
+    "centre": (561, 900, H_STAGE + 4),
+}
+
+
+def aim(head, target):
+    """(pan, tilt) DMX pour viser target depuis head.
+    Calibration observée : pan 128 + tilt < 128 => faisceau vers +x (mur côté guitare)."""
+    import math
+    hx, hy = head
+    tx, ty, tz = target
+    dx, dy = (tx - hx) / PX_PER_FT, (ty - hy) / PX_PER_FT
+    dz = H_LIGHTS - tz
+    theta = math.degrees(math.atan2(math.hypot(dx, dy), dz))          # angle depuis la verticale
+    phi = math.degrees(math.atan2(dy, dx))                            # direction au sol
+    best = None
+    for off, tsign in ((0, -1), (180, 1), (-180, 1)):                 # deux façons d'y arriver
+        for wrap in (-360, 0, 360):
+            pan = 128 + PAN_SIGN * (phi - off + wrap) * 255 / PAN_DEG
+            tilt = 128 + tsign * theta * 255 / TILT_DEG
+            if 0 <= pan <= 255 and 0 <= tilt <= 255:
+                # même « branche » pour toutes les têtes (tilt < 128) : pas de demi-tour entre positions
+                cand = (abs(pan - 128) + (60 if tsign > 0 else 0), round(pan), round(tilt))
+                best = min(best, cand) if best else cand
+    return (best[1], best[2]) if best else (128, 128)
+
+
+def aim_all(targets):
+    return [aim(h, t) for h, t in zip(HEAD_PX, targets)]
+
+
 POS_FADE = 1200
+S_ = SPOT
 POSITIONS = [
-    ("Centre", [(128, 128)] * 4),
-    ("Public", [(128, 70)] * 4),
-    ("Band", [(128, 185)] * 4),
-    ("Chanteur", [(140, 175), (134, 180), (122, 180), (116, 175)]),
-    ("Croisé", [(150, 160), (140, 160), (116, 160), (106, 160)]),
-    ("Éventail", [(100, 90), (118, 90), (138, 90), (156, 90)]),
-    ("V inversé", [(106, 120), (122, 100), (134, 100), (150, 120)]),
-    ("Plafond", [(128, 30)] * 4),
+    ("Centre", aim_all([S_["centre"]] * 4)),
+    ("Public", aim_all([(300, 1350, 4), (850, 1350, 4), (300, 1650, 4), (850, 1650, 4)])),
+    ("Band", aim_all([S_["basse"], S_["batterie"], S_["chanteur"], S_["guitare"]])),
+    ("Chanteur", aim_all([S_["chanteur"]] * 4)),
+    ("Croisé", aim_all([S_["guitare"], S_["basse"], S_["guitare"], S_["basse"]])),
+    ("Éventail", aim_all([(200, 720, 8), (430, 720, 8), (690, 720, 8), (920, 720, 8)])),
+    ("V inversé", aim_all([(180, 1050, H_STAGE), (560, 730, 7), (560, 730, 7), (940, 1050, H_STAGE)])),
+    ("Plafond", aim_all([(250, 700, H_LIGHTS - 1), (450, 700, H_LIGHTS - 1),
+                         (670, 700, H_LIGHTS - 1), (870, 700, H_LIGHTS - 1)])),
 ]
+for _n, _pts in POSITIONS:
+    print(f"  {_n:10s}", _pts)
 pos = {}
 for name, pts in POSITIONS:
     pos[name] = scene(f"Position {name}", "Têtes/Positions",
