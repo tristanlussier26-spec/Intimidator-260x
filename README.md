@@ -114,8 +114,10 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 5. **POSITIONS** : 11 positions et 6 mouvements
 
 Le Stream Deck envoie une **impulsion** (pas de « maintenir ») :
-- **strobes** = on/off (un appui = on, un appui = off) ;
-- **kicks** (bumps gauche/droite, flashs rouge/bleu/UV/têtes) = un coup bref qui s'éteint tout seul en fondu (`KICK_HOLD` / `KICK_FADE` dans le script).
+toute la section Stream Deck est en **kicks** : un appui = un coup bref qui s'éteint tout seul.
+- **strobe PAR, strobe têtes, strobe fou** = rafale de 1 s qui coupe net (`STROBE_KICK`) ;
+- **blinder** = coup de 250 ms puis fondu ;
+- **bumps gauche/droite, flashs rouge/bleu/UV/têtes** = coup bref puis fondu (`KICK_HOLD` / `KICK_FADE`).
 
 Le profil est généré par `tools/make_streamdeck.py` à partir du show : relance-le après chaque changement de raccourcis.
 
@@ -124,7 +126,7 @@ Chaque bouton du board a un raccourci clavier. Sur le Stream Deck : glisse l'act
 
 - QLC+ doit être **en avant-plan** et en **mode show (▶)** : le raccourci va à la fenêtre active.
 - Astuce : mets le nom du look et sa couleur comme titre/fond de la touche Stream Deck.
-- Les flashs (strobe, blinder, bumps) marchent tant que la touche est tenue.
+- Sur le board (souris/clavier), les flashs `S B D F G-M` marchent tant que la touche est tenue ; sur le Stream Deck, utilise les KICKS.
 
 
 **LOOKS DU SHOW — un bouton = tout le rig  **

@@ -303,6 +303,10 @@ KICKS = {n: kick(f"KICK {n}", sid) for n, sid in (
 prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
                      {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
+STROBE_KICK = 1000                     # ms : rafale de strobe d'un coup, coupe net
+KICKS.update({n: kick(f"KICK {n}", sid, hold=h, fade_out=fo) for n, sid, h, fo in (
+    ("Strobe PAR", strobe_par, STROBE_KICK, 0), ("Blinder", blinder, 250, 600),
+    ("Strobe têtes", strobe_heads, STROBE_KICK, 0), ("Strobe fou", strobe_rand, STROBE_KICK, 0))})
 
 # Positions calculées à partir du plan de la salle (vu du plafond, 1 carré = 2 pi).
 # Coordonnées en pixels de la capture du plan : x vers la droite (côté guitare), y vers le fond de la salle.
@@ -622,9 +626,9 @@ grid(f, [("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xF
          ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
      cols=3, w=172, h=88, action="Flash", font=BIG, keys=["G", "H", "J", "K", "L", "M"])
 
-f = frame(root, "STREAM DECK : strobes on/off · kicks = coup bref", 1260, 748, 590, 230, bg=0x181818)
-grid(f, [("STROBE\nPAR", strobe_par, 0xFFFFFF), ("BLINDER", blinder, 0xFFE070),
-         ("STROBE\nTÊTES", strobe_heads, 0xC8C8C8), ("STROBE\nFOU", strobe_rand, 0xA0A0FF),
+f = frame(root, "STREAM DECK : tout en kicks = coup bref qui s'éteint tout seul", 1260, 748, 590, 230, bg=0x181818)
+grid(f, [("KICK\nSTROBE", KICKS["Strobe PAR"], 0xFFFFFF), ("KICK\nBLINDER", KICKS["Blinder"], 0xFFE070),
+         ("KICK\nSTROBE\nTÊTES", KICKS["Strobe têtes"], 0xC8C8C8), ("KICK\nSTROBE\nFOU", KICKS["Strobe fou"], 0xA0A0FF),
          ("KICK\nGAUCHE", KICKS["Bump gauche"], 0xFFFFFF), ("KICK\nDROITE", KICKS["Bump droite"], 0xFFFFFF),
          ("KICK\nROUGE", KICKS["Flash rouge"], 0xE01010), ("KICK\nBLEU", KICKS["Flash bleu"], 0x1030E0),
          ("KICK\nUV", KICKS["Flash UV"], 0x5010B0), ("KICK\nTÊTES", KICKS["Flash têtes"], 0xD8D8D8)],
