@@ -100,6 +100,22 @@ def chaser(name, path, steps, hold=500, fade=0):
     return fid
 
 
+KICK_HOLD, KICK_FADE = 120, 350        # ms : durée du coup, puis fondu de sortie
+
+
+def kick(name, scene_id, hold=None, fade_out=None):
+    """Coup bref : joue la scène une seule fois puis s'éteint en fondu (pour le Stream Deck)."""
+    hold = KICK_HOLD if hold is None else hold
+    fade_out = KICK_FADE if fade_out is None else fade_out
+    f, fid = new_func("Chaser", name, "Kicks")
+    ET.SubElement(f, "Speed", {"FadeIn": "0", "FadeOut": str(fade_out), "Duration": str(hold)})
+    ET.SubElement(f, "Direction").text = "Forward"
+    ET.SubElement(f, "RunOrder").text = "SingleShot"
+    ET.SubElement(f, "SpeedModes", {"FadeIn": "Common", "FadeOut": "Common", "Duration": "Common"})
+    ET.SubElement(f, "Step", {"Number": "0", "FadeIn": "0", "Hold": "0", "FadeOut": "0"}).text = str(scene_id)
+    return fid
+
+
 def collection(name, path, members):
     f, fid = new_func("Collection", name, path)
     for n, sid in enumerate(members):
@@ -281,6 +297,9 @@ head_chase_gobo = chaser("Têtes Chase gobos", "Têtes/FX", [gobo[f"Gobo {i}"] f
 TEMPO_FX += [head_chase_col, head_chase_gobo]
 flash_heads = scene("Têtes Flash blanc", "Têtes/FX",
                     {h: {H_DIM: 255, H_COLOR: 3, H_GOBO: 3, H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
+KICKS = {n: kick(f"KICK {n}", sid) for n, sid in (
+    ("Bump gauche", bump_left), ("Bump droite", bump_right), ("Flash rouge", flash_red),
+    ("Flash bleu", flash_blue), ("Flash UV", flash_uv), ("Flash têtes", flash_heads))}
 prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
                      {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
@@ -603,12 +622,12 @@ grid(f, [("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xF
          ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
      cols=3, w=172, h=88, action="Flash", font=BIG, keys=["G", "H", "J", "K", "L", "M"])
 
-f = frame(root, "ON/OFF (pour le Stream Deck : 1 appui = on, 1 appui = off)", 1260, 748, 590, 230, bg=0x181818)
+f = frame(root, "STREAM DECK : strobes on/off · kicks = coup bref", 1260, 748, 590, 230, bg=0x181818)
 grid(f, [("STROBE\nPAR", strobe_par, 0xFFFFFF), ("BLINDER", blinder, 0xFFE070),
          ("STROBE\nTÊTES", strobe_heads, 0xC8C8C8), ("STROBE\nFOU", strobe_rand, 0xA0A0FF),
-         ("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xFFFFFF),
-         ("FLASH\nROUGE", flash_red, 0xE01010), ("FLASH\nBLEU", flash_blue, 0x1030E0),
-         ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
+         ("KICK\nGAUCHE", KICKS["Bump gauche"], 0xFFFFFF), ("KICK\nDROITE", KICKS["Bump droite"], 0xFFFFFF),
+         ("KICK\nROUGE", KICKS["Flash rouge"], 0xE01010), ("KICK\nBLEU", KICKS["Flash bleu"], 0x1030E0),
+         ("KICK\nUV", KICKS["Flash UV"], 0x5010B0), ("KICK\nTÊTES", KICKS["Flash têtes"], 0xD8D8D8)],
      cols=5, w=106, h=88, font=BOLD, keys=L("Alt+Shift+", "KLMNOPQRST"))
 
 props = ET.SubElement(vc, "Properties")

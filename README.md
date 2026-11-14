@@ -113,7 +113,9 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 4. **TÊTES** : couleurs, gobos, rotation, prisme, chases
 5. **POSITIONS** : 11 positions et 6 mouvements
 
-Le Stream Deck envoie une **impulsion** (pas de « maintenir ») : les strobes, bumps et flashs du profil sont donc des **on/off** (un appui = on, un appui = off).
+Le Stream Deck envoie une **impulsion** (pas de « maintenir ») :
+- **strobes** = on/off (un appui = on, un appui = off) ;
+- **kicks** (bumps gauche/droite, flashs rouge/bleu/UV/têtes) = un coup bref qui s'éteint tout seul en fondu (`KICK_HOLD` / `KICK_FADE` dans le script).
 
 Le profil est généré par `tools/make_streamdeck.py` à partir du show : relance-le après chaque changement de raccourcis.
 
