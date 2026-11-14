@@ -433,8 +433,8 @@ def aim(head, target, pan_offset=0.0):
 # Mettre True pour une tête dont le pan tourne à l'envers.
 PAN_INVERT = [False, False, False, False]
 # Tête montée tournée d'un demi-tour (sa base regarde dans l'autre sens) : +180° de pan.
-# Tête 1 : éclairait derrière la scène au lieu de la scène (constaté dans la salle).
-PAN_TURN = [180, 0, 0, 0]
+# (aucune pour l'instant)
+PAN_TURN = [0, 0, 0, 0]
 
 
 def aim_all(targets):
