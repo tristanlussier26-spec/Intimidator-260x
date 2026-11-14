@@ -13,6 +13,21 @@ Profil de fixture QLC+ (`.qxf`) pour la Chauvet Intimidator Spot 260X, modes **1
 
 ![Aperçu de la Virtual Console](show/apercu-virtual-console.png)
 
+## Tout installer en une commande (Windows)
+Ouvre **PowerShell** et colle :
+
+```powershell
+irm https://github.com/tristanlussier26-spec/Intimidator-260x/raw/main/install.ps1 | iex
+```
+
+La commande ([`install.ps1`](install.ps1)) :
+1. télécharge la dernière version dans `Documents\Show-Rock` : le show, le profil des têtes, le lanceur, le plugin et le profil Stream Deck ;
+2. installe le plugin Stream Deck (confirme dans Stream Deck) ;
+3. importe le profil XL ;
+4. lance QLC+ avec l'accès web, en mode show.
+
+Relance la même commande pour mettre à jour après un changement sur le GitHub.
+
 ## Ouvrir le show
 1. Télécharger le dossier `show/` au complet (le `.qxw` et le `.qxf` ensemble).
 2. Dans QLC+ : **Fichier → Ouvrir** → `Show-Rock.qxw`.
