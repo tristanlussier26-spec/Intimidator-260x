@@ -81,6 +81,7 @@ function keyUp(ctx) {
   const c = contexts.get(ctx);
   press(ctx, 0);
   if (c && c.hold && c.held) { c.held = false; press(ctx, 255); }
+  setTimeout(() => refresh(ctx), 150);   // resynchronise le cadre avec l'état réel de QLC+
 }
 
 function press(ctx, value) {
@@ -94,7 +95,7 @@ function setKeyState(ctx, force) {
   const c = contexts.get(ctx);
   if (!c) return;
   const v = status.get(c.widgetId) || 0;
-  const st = v > 0 ? 1 : 0;
+  const st = v === 255 ? 1 : 0;          // cadre seulement si le bouton est vraiment actif (pas « surveillé »)
   if (st !== c.state || force) {
     c.state = st;
     sdSend({ event: 'setState', context: ctx, payload: { state: st } });
