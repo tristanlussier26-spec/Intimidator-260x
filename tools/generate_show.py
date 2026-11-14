@@ -429,8 +429,17 @@ def aim(head, target):
     return (best[1], best[2]) if best else (128, 128)
 
 
+# Têtes dont le pan tourne à l'envers (montage ou réglage « pan reverse » dans le menu de la tête).
+# Tête 1 : inversé, constaté dans la salle. Si tu enlèves le pan reverse dans son menu, mets False.
+PAN_INVERT = [True, False, False, False]
+
+
 def aim_all(targets):
-    return [aim(h, t) for h, t in zip(HEAD_PX, targets)]
+    out = []
+    for i, (h, t) in enumerate(zip(HEAD_PX, targets)):
+        pan, tilt = aim(h, t)
+        out.append((255 - pan if PAN_INVERT[i] else pan, tilt))
+    return out
 
 
 POS_FADE = 1200
@@ -721,9 +730,10 @@ xy = ET.SubElement(root, "XYPad", {"Caption": "VISER EN LIVE (4 têtes)", "ID": 
                                    "InvertedAppearance": "0"})
 winstate(xy, 1260, 443, 290, 120)
 appearance(xy)
-for h in HEADS:
+for i, h in enumerate(HEADS):
     fx = ET.SubElement(xy, "Fixture", {"ID": str(h), "Head": "0"})
-    ET.SubElement(fx, "Axis", {"ID": "X", "LowLimit": "0", "HighLimit": "1", "Reverse": "False"})
+    ET.SubElement(fx, "Axis", {"ID": "X", "LowLimit": "0", "HighLimit": "1",
+                               "Reverse": "True" if PAN_INVERT[i] else "False"})
     ET.SubElement(fx, "Axis", {"ID": "Y", "LowLimit": "0", "HighLimit": "1", "Reverse": "False"})
 ET.SubElement(xy, "Pan", {"Position": "127"})
 ET.SubElement(xy, "Tilt", {"Position": "127"})
