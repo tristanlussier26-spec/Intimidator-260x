@@ -20,15 +20,16 @@ HEAD_ADDR = [1, 15, 29, 43]
 PAR_MODEL = ("Blizzard Lighting", "Hotbox EXA", "11 Channel Mode", 11)
 PAR_FIRST, PAR_COUNT = 66, 4
 # PAR ajoutés, en mode « couleurs seulement » (fixtures Generic inclus dans QLC+, rien à installer)
-MOS_MODEL = ("Generic", "Generic RGB", "RGB", 3)      # MOSFiATA PAR-36 (36 LED RGB), mode 3 canaux
+MOS_MODEL = ("MOSFiATA", "PAR 36 RGB", "7 Channel", 7)   # MOSFiATA 36 LED RGB : dimmer R G B strobe mode vitesse
+MOS_DIM, MOS_STROBE, MOS_MODE, MOS_SPEED = 0, 4, 5, 6
 UK_MODEL = ("UKing", "ZQ01061 RGBW Par", "8 Channel", 8)   # U`King 18x10W RGBW, mode 8 canaux (A001)
 UK_DIM, UK_STROBE, UK_FUNC, UK_SPEED = 0, 5, 6, 7
 # D'après le plan de la salle (x : 0 = gauche de la scène, 1 = droite, vu du public)
 MOS = [  # nom, adresse, x, rôle
-    ("M1 contre", 110, 0.10, "back"), ("M2 contre", 113, 0.30, "back"),
-    ("M3 contre", 116, 0.61, "back"), ("M4 contre", 119, 0.80, "back"),
-    ("M5 face G", 122, 0.00, "front"), ("M6 face D", 125, 1.00, "front"),
-    ("M7 public", 128, -0.05, "crowd"), ("M8 public", 131, -0.04, "crowd"),
+    ("M1 contre", 160, 0.10, "back"), ("M2 contre", 167, 0.30, "back"),
+    ("M3 contre", 174, 0.61, "back"), ("M4 contre", 181, 0.80, "back"),
+    ("M5 face G", 188, 0.00, "front"), ("M6 face D", 195, 1.00, "front"),
+    ("M7 public", 202, -0.05, "crowd"), ("M8 public", 209, -0.04, "crowd"),
 ]
 UK = [("U1 face", 134, 0.33, "front"), ("U2 face", 142, 0.63, "front")]
 POS_HOTBOX = [0.2, 0.4, 0.6, 0.8]
@@ -60,7 +61,8 @@ for model, lst in ((MOS_MODEL, MOS), (UK_MODEL, UK)):
         fixtures.append((len(fixtures), name, model, a - 1))
 FOH = len(fixtures)
 fixtures.append((FOH, "Lekos FOH (DMX-4)", ("Generic", "Generic", "4 Channel", 4), FOH_ADDR - 1))
-RGB_PARS = {f[0]: (3 if f[2] is MOS_MODEL else 8) for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}
+RGB_PARS = {f[0]: (7 if f[2] is MOS_MODEL else 8) for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}
+MOSS = [f for f, n in RGB_PARS.items() if n == 7]
 UKS = [f for f, n in RGB_PARS.items() if n == 8]
 PARS = sorted(XPOS, key=lambda f: XPOS[f])          # tous les PAR, de gauche à droite
 CROWD = [p for p in PARS if ROLE.get(p) == "crowd"]  # éclairent le public : seulement dans les flashs
@@ -119,8 +121,8 @@ def rgbify(chans, nch):
     r, g, b, a, w, uv = (chans.get(k, 0) for k in keys)
     if nch == 8:     # U`King 8 canaux : dimmer, R, G, B, W (+ strobe/fonction gérés par BASE)
         out = [255, r + a + uv * .3, g + a * .45, b + uv * .6, w]
-    else:
-        out = [r + a + w * .9 + uv * .3, g + a * .45 + w * .8, b + w * .7 + uv * .6]
+    else:            # MOSFiATA 7 canaux : dimmer, R, G, B (le blanc est fait avec R+G+B)
+        out = [255, r + a + w * .9 + uv * .3, g + a * .45 + w * .8, b + w * .7 + uv * .6]
     return {i: min(255, int(round(v))) for i, v in enumerate(out)}
 
 
@@ -230,7 +232,8 @@ def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 
 base = scene("BASE (toujours active)", "Système",
              {**{p: {P_STROBE: 0, P_PROG: 0, P_SPEED: 0, P_32B: 0} for p in HOTBOX},
               **{h: {H_STROBE: 0, H_PRISM: 0, H_GROT: 0, H_FUNC: 0, H_MACRO: 0} for h in HEADS},
-              **{u: {"raw": {UK_STROBE: 0, UK_FUNC: 0, UK_SPEED: 0}} for u in UKS}})
+              **{u: {"raw": {UK_STROBE: 0, UK_FUNC: 0, UK_SPEED: 0}} for u in UKS},
+              **{m: {"raw": {MOS_STROBE: 0, MOS_MODE: 0, MOS_SPEED: 0}} for m in MOSS}})
 engine.set("Autostart", str(base))
 
 # ================================================================ PAR
@@ -629,7 +632,7 @@ grid(f, [(n, fid, 0x3A3A3A) for n, fid in FX.items()], cols=5, w=122, h=60, keys
 
 # --- Masters / tempo / flash
 f = frame(root, "MASTERS & TEMPO", 10, 708, 670, 270)
-level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX] + [(u, UK_DIM) for u in UKS], 15, 35, h=225)
+level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX] + [(u, UK_DIM) for u in UKS] + [(m, MOS_DIM) for m in MOSS], 15, 35, h=225)
 level_slider(f, "TÊTES", [(h, H_DIM) for h in HEADS], 115, 35, h=225)
 sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO — tape le beat", "ID": wid()})
 winstate(sd, 220, 35, 230, 225)

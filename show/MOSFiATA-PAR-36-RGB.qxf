@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE FixtureDefinition>
+<FixtureDefinition xmlns="http://www.qlcplus.org/FixtureDefinition">
+ <Creator>
+  <Name>Q Light Controller Plus</Name>
+  <Version>4.12.7</Version>
+  <Author>LeQueb (PAR 36 LED RGB MOSFiATA, mode 7 canaux)</Author>
+ </Creator>
+ <Manufacturer>MOSFiATA</Manufacturer>
+ <Model>PAR 36 RGB</Model>
+ <Type>Color Changer</Type>
+ <Channel Name="Dimmer" Preset="IntensityMasterDimmer"/>
+ <Channel Name="Red" Preset="IntensityRed"/>
+ <Channel Name="Green" Preset="IntensityGreen"/>
+ <Channel Name="Blue" Preset="IntensityBlue"/>
+ <Channel Name="Strobe">
+  <Group Byte="0">Shutter</Group>
+  <Capability Min="0" Max="9" Preset="ShutterOpen">Pas de strobe</Capability>
+  <Capability Min="10" Max="255" Preset="StrobeSlowToFast">Strobe lent → rapide</Capability>
+ </Channel>
+ <Channel Name="Mode">
+  <Group Byte="0">Effect</Group>
+  <Capability Min="0" Max="50">Contrôle DMX (canaux 1-5)</Capability>
+  <Capability Min="51" Max="255">Programmes internes / son</Capability>
+ </Channel>
+ <Channel Name="Speed">
+  <Group Byte="0">Speed</Group>
+  <Capability Min="0" Max="255">Vitesse des programmes</Capability>
+ </Channel>
+ <Mode Name="7 Channel">
+  <Channel Number="0">Dimmer</Channel>
+  <Channel Number="1">Red</Channel>
+  <Channel Number="2">Green</Channel>
+  <Channel Number="3">Blue</Channel>
+  <Channel Number="4">Strobe</Channel>
+  <Channel Number="5">Mode</Channel>
+  <Channel Number="6">Speed</Channel>
+ </Mode>
+ <Physical>
+  <Bulb Type="LED" Lumens="0" ColourTemperature="0"/>
+  <Dimensions Weight="1" Width="200" Height="200" Depth="100"/>
+  <Lens Name="Other" DegreesMin="25" DegreesMax="25"/>
+  <Focus Type="Fixed" PanMax="0" TiltMax="0"/>
+  <Technical PowerConsumption="36" DmxConnector="3-pin"/>
+ </Physical>
+</FixtureDefinition>
