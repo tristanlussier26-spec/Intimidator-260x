@@ -44,12 +44,14 @@ Relance la même commande pour mettre à jour après un changement sur le GitHub
 | M1 à M4 : contre-jours au fond de la scène (gauche → droite) | MOSFiATA PAR-36 → Generic RGB, mode RGB (**3 canaux**) | 110, 113, 116, 119 |
 | M5 face gauche · M6 face droite (coins avant de la scène) | MOSFiATA PAR-36 → Generic RGB (3 canaux) | 122, 125 |
 | M7 · M8 : public, mur gauche (avant · arrière) | MOSFiATA PAR-36 → Generic RGB (3 canaux) | 128, 131 |
+| 3 lekos FOH | Dimmer Chauvet DMX-4 → Generic dimmer 4 canaux (lekos sur les sorties 1, 2, 3) | 150 (canaux 150-152) |
 | U1 face gauche · U2 face droite (bord de scène) | U`King ZQ01061 18x10W RGBW → `UKing-ZQ01061-RGBW-Par.qxf`, **8 canaux** (menu `A001`) | 134, 142 |
 
 - Sur chaque Hotbox : menu → mode **11CH** et l'adresse de la table.
 - Les MOSFiATA sont en mode couleurs seulement (Generic RGB, inclus dans QLC+). Leur strobe est fait par QLC+ (clignotement).
 - Les U`King sont en 8 canaux : dimmer, R, G, B, W, strobe, fonction, vitesse. Leur profil `UKing-ZQ01061-RGBW-Par.qxf` doit être **à côté de `Show-Rock.qxw`** (le script d'installation le met là). La scène BASE garde strobe et fonction à 0, et le dimmer suit le fader PAR.
 - **M7 et M8 éclairent le public** : ils restent éteints dans les couleurs et les looks, et ne s'allument qu'avec le blinder, les strobes, les bumps et les flashs.
+- **Lekos FOH** : hors du show. Aucun look, effet, flash ni blinder n'y touche. On les contrôle seulement avec les boutons rotatifs du cadre **FOH — LEKOS** (FOH = les 3 ensemble, L1 à L3 = chacun), plafonnés à **70 %** (valeur DMX 178). Sur le DMX-4 : mode DMX, adresse `R150`, sorties en dimmer (pas en switch). Le BLACKOUT les coupe aussi ; FONDU AU NOIR ne les touche pas.
 - Toutes les couleurs du show (ambre, blanc chaud, UV…) sont converties automatiquement en RGB ou RGBW.
 - À vérifier à la réception : dans le manuel MOSFiATA, le mode 3 canaux doit être rouge, vert, bleu dans cet ordre. Sinon, change `MOS_MODEL` dans `tools/generate_show.py` (ex. mode `GRB`).
 

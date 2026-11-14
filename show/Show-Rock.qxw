@@ -192,6 +192,16 @@
    <Address>141</Address>
    <Channels>8</Channels>
   </Fixture>
+  <Fixture>
+   <Manufacturer>Generic</Manufacturer>
+   <Model>Generic</Model>
+   <Mode>4 Channel</Mode>
+   <ID>18</ID>
+   <Name>Lekos FOH (DMX-4)</Name>
+   <Universe>0</Universe>
+   <Address>149</Address>
+   <Channels>4</Channels>
+  </Fixture>
   <FixtureGroup ID="0">
    <Name>PAR scène (gauche → droite)</Name>
    <Size X="12" Y="1" />
@@ -2713,7 +2723,93 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </Frame>
-   <SoloFrame Caption="TÊTES — COULEUR" ID="75">
+   <Frame Caption="FOH — LEKOS (max 70 %)" ID="75">
+    <Appearance>
+     <FrameStyle>Sunken</FrameStyle>
+     <ForegroundColor>Default</ForegroundColor>
+     <BackgroundColor>4279903280</BackgroundColor>
+     <BackgroundImage>None</BackgroundImage>
+     <Font>Default</Font>
+    </Appearance>
+    <WindowState Visible="False" X="1260" Y="613" Width="290" Height="125" />
+    <AllowChildren>True</AllowChildren>
+    <AllowResize>True</AllowResize>
+    <ShowHeader>True</ShowHeader>
+    <ShowEnableButton>False</ShowEnableButton>
+    <Collapsed>False</Collapsed>
+    <Disabled>False</Disabled>
+    <Slider Caption="FOH" ID="76" WidgetStyle="Knob" InvertedAppearance="false">
+     <WindowState Visible="False" X="8" Y="32" Width="66" Height="88" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>Default</ForegroundColor>
+      <BackgroundColor>Default</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Level</SliderMode>
+     <Level LowLimit="0" HighLimit="178" Value="0">
+      <Channel Fixture="18">0</Channel>
+      <Channel Fixture="18">1</Channel>
+      <Channel Fixture="18">2</Channel>
+     </Level>
+     <Playback>
+      <Function>4294967295</Function>
+     </Playback>
+    </Slider>
+    <Slider Caption="L1" ID="77" WidgetStyle="Knob" InvertedAppearance="false">
+     <WindowState Visible="False" X="78" Y="32" Width="66" Height="88" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>Default</ForegroundColor>
+      <BackgroundColor>Default</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Level</SliderMode>
+     <Level LowLimit="0" HighLimit="178" Value="0">
+      <Channel Fixture="18">0</Channel>
+     </Level>
+     <Playback>
+      <Function>4294967295</Function>
+     </Playback>
+    </Slider>
+    <Slider Caption="L2" ID="78" WidgetStyle="Knob" InvertedAppearance="false">
+     <WindowState Visible="False" X="146" Y="32" Width="66" Height="88" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>Default</ForegroundColor>
+      <BackgroundColor>Default</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Level</SliderMode>
+     <Level LowLimit="0" HighLimit="178" Value="0">
+      <Channel Fixture="18">1</Channel>
+     </Level>
+     <Playback>
+      <Function>4294967295</Function>
+     </Playback>
+    </Slider>
+    <Slider Caption="L3" ID="79" WidgetStyle="Knob" InvertedAppearance="false">
+     <WindowState Visible="False" X="214" Y="32" Width="66" Height="88" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>Default</ForegroundColor>
+      <BackgroundColor>Default</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <SliderMode ValueDisplayStyle="Percentage" ClickAndGoType="None" Monitor="false">Level</SliderMode>
+     <Level LowLimit="0" HighLimit="178" Value="0">
+      <Channel Fixture="18">2</Channel>
+     </Level>
+     <Playback>
+      <Function>4294967295</Function>
+     </Playback>
+    </Slider>
+   </Frame>
+   <SoloFrame Caption="TÊTES — COULEUR" ID="80">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -2729,7 +2825,7 @@
     <Mixing>False</Mixing>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Blanc" ID="76" Icon="">
+    <Button Caption="Blanc" ID="81" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2743,7 +2839,7 @@
      <Key>Ctrl+Shift+A</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Rouge" ID="77" Icon="">
+    <Button Caption="Rouge" ID="82" Icon="">
      <WindowState Visible="False" X="118" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2757,7 +2853,7 @@
      <Key>Ctrl+Shift+B</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Orange" ID="78" Icon="">
+    <Button Caption="Orange" ID="83" Icon="">
      <WindowState Visible="False" X="226" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2771,7 +2867,7 @@
      <Key>Ctrl+Shift+C</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Jaune" ID="79" Icon="">
+    <Button Caption="Jaune" ID="84" Icon="">
      <WindowState Visible="False" X="334" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2785,7 +2881,7 @@
      <Key>Ctrl+Shift+D</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Vert" ID="80" Icon="">
+    <Button Caption="Vert" ID="85" Icon="">
      <WindowState Visible="False" X="442" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2799,7 +2895,7 @@
      <Key>Ctrl+Shift+E</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Bleu" ID="81" Icon="">
+    <Button Caption="Bleu" ID="86" Icon="">
      <WindowState Visible="False" X="10" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2813,7 +2909,7 @@
      <Key>Ctrl+Shift+F</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="CTO" ID="82" Icon="">
+    <Button Caption="CTO" ID="87" Icon="">
      <WindowState Visible="False" X="118" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2827,7 +2923,7 @@
      <Key>Ctrl+Shift+G</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Cyan" ID="83" Icon="">
+    <Button Caption="Cyan" ID="88" Icon="">
      <WindowState Visible="False" X="226" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2841,7 +2937,7 @@
      <Key>Ctrl+Shift+H</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Magenta" ID="84" Icon="">
+    <Button Caption="Magenta" ID="89" Icon="">
      <WindowState Visible="False" X="334" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2855,7 +2951,7 @@
      <Key>Ctrl+Shift+I</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Arc-en-ciel" ID="85" Icon="">
+    <Button Caption="Arc-en-ciel" ID="90" Icon="">
      <WindowState Visible="False" X="442" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2870,7 +2966,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </SoloFrame>
-   <SoloFrame Caption="TÊTES — GOBO" ID="86">
+   <SoloFrame Caption="TÊTES — GOBO" ID="91">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -2886,7 +2982,7 @@
     <Mixing>False</Mixing>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Ouvert" ID="87" Icon="">
+    <Button Caption="Ouvert" ID="92" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2900,7 +2996,7 @@
      <Key>Ctrl+Shift+K</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 1" ID="88" Icon="">
+    <Button Caption="Gobo 1" ID="93" Icon="">
      <WindowState Visible="False" X="118" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2914,7 +3010,7 @@
      <Key>Ctrl+Shift+L</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 2" ID="89" Icon="">
+    <Button Caption="Gobo 2" ID="94" Icon="">
      <WindowState Visible="False" X="226" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2928,7 +3024,7 @@
      <Key>Ctrl+Shift+M</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 3" ID="90" Icon="">
+    <Button Caption="Gobo 3" ID="95" Icon="">
      <WindowState Visible="False" X="334" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2942,7 +3038,7 @@
      <Key>Ctrl+Shift+N</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 4" ID="91" Icon="">
+    <Button Caption="Gobo 4" ID="96" Icon="">
      <WindowState Visible="False" X="442" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2956,7 +3052,7 @@
      <Key>Ctrl+Shift+O</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 5" ID="92" Icon="">
+    <Button Caption="Gobo 5" ID="97" Icon="">
      <WindowState Visible="False" X="10" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2970,7 +3066,7 @@
      <Key>Ctrl+Shift+P</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 6" ID="93" Icon="">
+    <Button Caption="Gobo 6" ID="98" Icon="">
      <WindowState Visible="False" X="118" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2984,7 +3080,7 @@
      <Key>Ctrl+Shift+Q</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Gobo 7" ID="94" Icon="">
+    <Button Caption="Gobo 7" ID="99" Icon="">
      <WindowState Visible="False" X="226" Y="107" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -2999,7 +3095,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </SoloFrame>
-   <Frame Caption="TÊTES — FX" ID="95">
+   <Frame Caption="TÊTES — FX" ID="100">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3014,7 +3110,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Rotation gobo" ID="96" Icon="">
+    <Button Caption="Rotation gobo" ID="101" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3028,7 +3124,7 @@
      <Key>Ctrl+Shift+T</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Rotation rapide" ID="97" Icon="">
+    <Button Caption="Rotation rapide" ID="102" Icon="">
      <WindowState Visible="False" X="118" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3042,7 +3138,7 @@
      <Key>Ctrl+Shift+U</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Prisme" ID="98" Icon="">
+    <Button Caption="Prisme" ID="103" Icon="">
      <WindowState Visible="False" X="226" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3056,7 +3152,7 @@
      <Key>Ctrl+Shift+V</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Chase couleurs" ID="99" Icon="">
+    <Button Caption="Chase couleurs" ID="104" Icon="">
      <WindowState Visible="False" X="334" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3070,7 +3166,7 @@
      <Key>Ctrl+Shift+W</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Chase gobos" ID="100" Icon="">
+    <Button Caption="Chase gobos" ID="105" Icon="">
      <WindowState Visible="False" X="442" Y="35" Width="100" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3085,7 +3181,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </Frame>
-   <SoloFrame Caption="TÊTES — POSITION (fondu 1,2 s)" ID="101">
+   <SoloFrame Caption="TÊTES — POSITION (fondu 1,2 s)" ID="106">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3101,7 +3197,7 @@
     <Mixing>False</Mixing>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Centre" ID="102" Icon="">
+    <Button Caption="Centre" ID="107" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3115,7 +3211,7 @@
      <Key>Shift+A</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Public" ID="103" Icon="">
+    <Button Caption="Public" ID="108" Icon="">
      <WindowState Visible="False" X="106" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3129,7 +3225,7 @@
      <Key>Shift+B</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Band" ID="104" Icon="">
+    <Button Caption="Band" ID="109" Icon="">
      <WindowState Visible="False" X="202" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3143,7 +3239,7 @@
      <Key>Shift+C</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Chanteur" ID="105" Icon="">
+    <Button Caption="Chanteur" ID="110" Icon="">
      <WindowState Visible="False" X="298" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3157,7 +3253,7 @@
      <Key>Shift+D</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Croisé" ID="106" Icon="">
+    <Button Caption="Croisé" ID="111" Icon="">
      <WindowState Visible="False" X="394" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3171,7 +3267,7 @@
      <Key>Shift+E</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Éventail" ID="107" Icon="">
+    <Button Caption="Éventail" ID="112" Icon="">
      <WindowState Visible="False" X="490" Y="35" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3185,7 +3281,7 @@
      <Key>Shift+F</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="V inversé" ID="108" Icon="">
+    <Button Caption="V inversé" ID="113" Icon="">
      <WindowState Visible="False" X="10" Y="107" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3199,7 +3295,7 @@
      <Key>Shift+G</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Batterie" ID="109" Icon="">
+    <Button Caption="Batterie" ID="114" Icon="">
      <WindowState Visible="False" X="106" Y="107" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3213,7 +3309,7 @@
      <Key>Shift+H</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Guitare" ID="110" Icon="">
+    <Button Caption="Guitare" ID="115" Icon="">
      <WindowState Visible="False" X="202" Y="107" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3227,7 +3323,7 @@
      <Key>Shift+I</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Basse" ID="111" Icon="">
+    <Button Caption="Basse" ID="116" Icon="">
      <WindowState Visible="False" X="298" Y="107" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3241,7 +3337,7 @@
      <Key>Shift+J</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Plafond" ID="112" Icon="">
+    <Button Caption="Plafond" ID="117" Icon="">
      <WindowState Visible="False" X="394" Y="107" Width="88" Height="64" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3256,8 +3352,8 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </SoloFrame>
-   <XYPad Caption="VISER EN LIVE (4 têtes)" ID="113" InvertedAppearance="0">
-    <WindowState Visible="False" X="1260" Y="443" Width="290" Height="295" />
+   <XYPad Caption="VISER EN LIVE (4 têtes)" ID="118" InvertedAppearance="0">
+    <WindowState Visible="False" X="1260" Y="443" Width="290" Height="165" />
     <Appearance>
      <FrameStyle>None</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3284,7 +3380,7 @@
     <Pan Position="127" />
     <Tilt Position="127" />
    </XYPad>
-   <SoloFrame Caption="TÊTES — MOUVEMENT" ID="114">
+   <SoloFrame Caption="TÊTES — MOUVEMENT" ID="119">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3300,7 +3396,7 @@
     <Mixing>False</Mixing>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="Cercle" ID="115" Icon="">
+    <Button Caption="Cercle" ID="120" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3314,7 +3410,7 @@
      <Key>Shift+L</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Huit" ID="116" Icon="">
+    <Button Caption="Huit" ID="121" Icon="">
      <WindowState Visible="False" X="148" Y="35" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3328,7 +3424,7 @@
      <Key>Shift+M</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Balayage lent" ID="117" Icon="">
+    <Button Caption="Balayage lent" ID="122" Icon="">
      <WindowState Visible="False" X="10" Y="115" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3342,7 +3438,7 @@
      <Key>Shift+N</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Vague tilt" ID="118" Icon="">
+    <Button Caption="Vague tilt" ID="123" Icon="">
      <WindowState Visible="False" X="148" Y="115" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3356,7 +3452,7 @@
      <Key>Shift+O</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Diamant" ID="119" Icon="">
+    <Button Caption="Diamant" ID="124" Icon="">
      <WindowState Visible="False" X="10" Y="195" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3370,7 +3466,7 @@
      <Key>Shift+P</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="Ballyhoo" ID="120" Icon="">
+    <Button Caption="Ballyhoo" ID="125" Icon="">
      <WindowState Visible="False" X="148" Y="195" Width="130" Height="72" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3385,7 +3481,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </SoloFrame>
-   <Frame Caption="FLASH &amp; BUMPS (maintenir)" ID="121">
+   <Frame Caption="FLASH &amp; BUMPS (maintenir)" ID="126">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3400,7 +3496,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="BUMP&#10;GAUCHE" ID="122" Icon="">
+    <Button Caption="BUMP&#10;GAUCHE" ID="127" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3414,7 +3510,7 @@
      <Key>G</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="BUMP&#10;DROITE" ID="123" Icon="">
+    <Button Caption="BUMP&#10;DROITE" ID="128" Icon="">
      <WindowState Visible="False" X="190" Y="35" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3428,7 +3524,7 @@
      <Key>H</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;ROUGE" ID="124" Icon="">
+    <Button Caption="FLASH&#10;ROUGE" ID="129" Icon="">
      <WindowState Visible="False" X="370" Y="35" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3442,7 +3538,7 @@
      <Key>J</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;BLEU" ID="125" Icon="">
+    <Button Caption="FLASH&#10;BLEU" ID="130" Icon="">
      <WindowState Visible="False" X="10" Y="131" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3456,7 +3552,7 @@
      <Key>K</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;UV" ID="126" Icon="">
+    <Button Caption="FLASH&#10;UV" ID="131" Icon="">
      <WindowState Visible="False" X="190" Y="131" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3470,7 +3566,7 @@
      <Key>L</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;TÊTES" ID="127" Icon="">
+    <Button Caption="FLASH&#10;TÊTES" ID="132" Icon="">
      <WindowState Visible="False" X="370" Y="131" Width="172" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3485,7 +3581,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </Frame>
-   <Frame Caption="STREAM DECK (plugin QLC+) : allumé tant que la touche est tenue" ID="128">
+   <Frame Caption="STREAM DECK (plugin QLC+) : allumé tant que la touche est tenue" ID="133">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3500,7 +3596,7 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Button Caption="STROBE&#10;PAR" ID="129" Icon="">
+    <Button Caption="STROBE&#10;PAR" ID="134" Icon="">
      <WindowState Visible="False" X="10" Y="35" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3514,7 +3610,7 @@
      <Key>Alt+Shift+K</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="BLINDER" ID="130" Icon="">
+    <Button Caption="BLINDER" ID="135" Icon="">
      <WindowState Visible="False" X="124" Y="35" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3528,7 +3624,7 @@
      <Key>Alt+Shift+L</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="STROBE&#10;TÊTES" ID="131" Icon="">
+    <Button Caption="STROBE&#10;TÊTES" ID="136" Icon="">
      <WindowState Visible="False" X="238" Y="35" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3542,7 +3638,7 @@
      <Key>Alt+Shift+M</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="STROBE&#10;FOU" ID="132" Icon="">
+    <Button Caption="STROBE&#10;FOU" ID="137" Icon="">
      <WindowState Visible="False" X="352" Y="35" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3556,7 +3652,7 @@
      <Key>Alt+Shift+N</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="BUMP&#10;GAUCHE" ID="133" Icon="">
+    <Button Caption="BUMP&#10;GAUCHE" ID="138" Icon="">
      <WindowState Visible="False" X="466" Y="35" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3570,7 +3666,7 @@
      <Key>Alt+Shift+O</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="BUMP&#10;DROITE" ID="134" Icon="">
+    <Button Caption="BUMP&#10;DROITE" ID="139" Icon="">
      <WindowState Visible="False" X="10" Y="131" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3584,7 +3680,7 @@
      <Key>Alt+Shift+P</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;ROUGE" ID="135" Icon="">
+    <Button Caption="FLASH&#10;ROUGE" ID="140" Icon="">
      <WindowState Visible="False" X="124" Y="131" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3598,7 +3694,7 @@
      <Key>Alt+Shift+Q</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;BLEU" ID="136" Icon="">
+    <Button Caption="FLASH&#10;BLEU" ID="141" Icon="">
      <WindowState Visible="False" X="238" Y="131" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3612,7 +3708,7 @@
      <Key>Alt+Shift+R</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;UV" ID="137" Icon="">
+    <Button Caption="FLASH&#10;UV" ID="142" Icon="">
      <WindowState Visible="False" X="352" Y="131" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
@@ -3626,7 +3722,7 @@
      <Key>Alt+Shift+S</Key>
      <Intensity Adjust="False">100</Intensity>
     </Button>
-    <Button Caption="FLASH&#10;TÊTES" ID="138" Icon="">
+    <Button Caption="FLASH&#10;TÊTES" ID="143" Icon="">
      <WindowState Visible="False" X="466" Y="131" Width="106" Height="88" />
      <Appearance>
       <FrameStyle>None</FrameStyle>

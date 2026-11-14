@@ -32,6 +32,10 @@ MOS = [  # nom, adresse, x, rôle
 ]
 UK = [("U1 face", 134, 0.33, "front"), ("U2 face", 142, 0.63, "front")]
 POS_HOTBOX = [0.2, 0.4, 0.6, 0.8]
+# FOH : 3 lekos sur un dimmer Chauvet DMX-4 (canaux 1-3). Hors du show : aucun look ni effet,
+# seulement leurs faders, plafonnés à 70 %.
+FOH_ADDR, FOH_LEKOS = 150, 3
+FOH_MAX = round(255 * 0.70)            # 178 = 70 %
 
 # Canaux (index 0-based dans le mode)
 H_PAN, H_PANF, H_TILT, H_TILTF, H_SPEED, H_COLOR, H_GOBO, H_GROT, H_PRISM, H_FOCUS, \
@@ -54,6 +58,8 @@ for model, lst in ((MOS_MODEL, MOS), (UK_MODEL, UK)):
     for name, a, x, role in lst:
         XPOS[len(fixtures)], ROLE[len(fixtures)] = x, role
         fixtures.append((len(fixtures), name, model, a - 1))
+FOH = len(fixtures)
+fixtures.append((FOH, "Lekos FOH (DMX-4)", ("Generic", "Generic", "4 Channel", 4), FOH_ADDR - 1))
 RGB_PARS = {f[0]: (3 if f[2] is MOS_MODEL else 8) for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}
 UKS = [f for f, n in RGB_PARS.items() if n == 8]
 PARS = sorted(XPOS, key=lambda f: XPOS[f])          # tous les PAR, de gauche à droite
@@ -577,14 +583,14 @@ def grid(parent, items, cols, w=100, h=64, gap=8, top=35, left=10, action="Toggl
                key=keys[i] if keys else None, font=font, page=page)
 
 
-def level_slider(parent, caption, channels, x, y, w=90, h=250, value=255):
-    s = ET.SubElement(parent, "Slider", {"Caption": caption, "ID": wid(), "WidgetStyle": "Slider",
+def level_slider(parent, caption, channels, x, y, w=90, h=250, value=255, high=255, style="Slider"):
+    s = ET.SubElement(parent, "Slider", {"Caption": caption, "ID": wid(), "WidgetStyle": style,
                                          "InvertedAppearance": "false"})
     winstate(s, x, y, w, h)
     appearance(s, font=BOLD)
     ET.SubElement(s, "SliderMode", {"ValueDisplayStyle": "Percentage",
                                     "ClickAndGoType": "None", "Monitor": "false"}).text = "Level"
-    lv = ET.SubElement(s, "Level", {"LowLimit": "0", "HighLimit": "255", "Value": str(value)})
+    lv = ET.SubElement(s, "Level", {"LowLimit": "0", "HighLimit": str(high), "Value": str(value)})
     for fx, ch in channels:
         ET.SubElement(lv, "Channel", {"Fixture": str(fx)}).text = str(ch)
     pb = ET.SubElement(s, "Playback")
@@ -638,6 +644,12 @@ button(f, "BLACKOUT", NO_FUNC, 465, 191, 95, 72, "Blackout", 0x000000, "X", BOLD
 b = button(f, "FONDU\nAU NOIR", NO_FUNC, 568, 191, 95, 72, "StopAll", 0x602020, "N", BOLD)
 b.find("Action").set("FadeOut", "2000")
 
+# --- FOH : lekos, jamais plus de 70 %
+f = frame(root, "FOH — LEKOS (max 70 %)", 1260, 613, 290, 125, bg=0x1A2430)
+level_slider(f, "FOH", [(FOH, c) for c in range(FOH_LEKOS)], 8, 32, w=66, h=88, value=0, high=FOH_MAX, style="Knob")
+for i in range(FOH_LEKOS):
+    level_slider(f, f"L{i + 1}", [(FOH, i)], 78 + i * 68, 32, w=66, h=88, value=0, high=FOH_MAX, style="Knob")
+
 # --- Têtes
 f = frame(root, "TÊTES — COULEUR", 690, 258, 560, 175, solo=True)
 grid(f, [(n, head_color[n], bg) for n, _, bg in HEAD_COLORS], cols=5, keys=L("Ctrl+Shift+", "ABCDEFGHIJ"))
@@ -653,7 +665,7 @@ grid(f, [(n, pos[n], 0x204060) for n, _ in POSITIONS], cols=6, w=88, keys=L("Shi
 
 xy = ET.SubElement(root, "XYPad", {"Caption": "VISER EN LIVE (4 têtes)", "ID": wid(),
                                    "InvertedAppearance": "0"})
-winstate(xy, 1260, 443, 290, 295)
+winstate(xy, 1260, 443, 290, 165)
 appearance(xy)
 for h in HEADS:
     fx = ET.SubElement(xy, "Fixture", {"ID": str(h), "Head": "0"})
