@@ -17,6 +17,7 @@ for (let i = 2; i < process.argv.length - 1; i++) {
 
 const PLUGIN = args.pluginUUID;
 const contexts = new Map();       // context Stream Deck -> { widgetId, state }
+const LEVEL = 'ca.lequeb.qlcplus.level';   // action « Niveau » : fader / bouton rotatif de QLC+
 const status = new Map();         // id widget -> 255 / 127 / 0
 let widgets = [];                 // [{id, name}]
 let host = '127.0.0.1:9999';
@@ -45,10 +46,12 @@ sd.on('message', (raw) => {
     case 'willAppear':
     case 'didReceiveSettings':
       contexts.set(ctx, { widgetId: String(settings.widgetId || ''), hold: settings.mode === 'hold',
-                          state: -1, held: false });
+                          state: -1, held: false, level: m.action === LEVEL,
+                          step: parseInt(settings.step, 10) || 0, label: settings.label || '' });
       refresh(ctx);
       break;
     case 'willDisappear':
+      stopRepeat(ctx);
       contexts.delete(ctx);
       break;
     case 'keyDown':
@@ -73,12 +76,14 @@ sd.on('message', (raw) => {
 //   appui -> on ; relâchement -> on rappuie pour éteindre (si c'est nous qui l'avons allumé).
 function keyDown(ctx) {
   const c = contexts.get(ctx);
+  if (c && c.level) return levelDown(ctx);
   if (c && c.hold) c.held = (status.get(c.widgetId) || 0) === 0;
   press(ctx, 255);
 }
 
 function keyUp(ctx) {
   const c = contexts.get(ctx);
+  if (c && c.level) return stopRepeat(ctx);
   press(ctx, 0);
   if (c && c.hold && c.held) { c.held = false; press(ctx, 255); }
   setTimeout(() => refresh(ctx), 150);   // resynchronise le cadre avec l'état réel de QLC+
@@ -91,9 +96,43 @@ function press(ctx, value) {
   qlcSend(`${c.widgetId}|${value}`);
 }
 
+// ------------------------------------------------------------------ Niveau (faders)
+// step > 0 : monte de step %, step < 0 : descend, step = 0 : affiche seulement (appui = 0 %).
+// Tenir la touche répète. QLC+ applique lui-même la limite haute du fader (ex. 70 % des lekos).
+const repeats = new Map();
+function levelDown(ctx) {
+  const c = contexts.get(ctx);
+  if (!c.widgetId || !qlcOk) { sdSend({ event: 'showAlert', context: ctx }); return; }
+  const stepOnce = () => {
+    const cur = status.get(c.widgetId) || 0;
+    const next = c.step === 0 ? 0 : Math.max(0, Math.min(255, Math.round(cur + c.step * 2.55)));
+    status.set(c.widgetId, next);           // estimation immédiate, corrigée par le retour de QLC+
+    qlcSend(`${c.widgetId}|${next}`);
+  };
+  stepOnce();
+  if (c.step !== 0) {
+    const t = setTimeout(() => repeats.set(ctx, setInterval(stepOnce, 120)), 400);
+    repeats.set(ctx, t);
+  }
+}
+function stopRepeat(ctx) {
+  const t = repeats.get(ctx);
+  if (t) { clearTimeout(t); clearInterval(t); repeats.delete(ctx); }
+  const c = contexts.get(ctx);
+  if (c && c.widgetId) setTimeout(() => qlcSend(`QLC+API|getWidgetStatus|${c.widgetId}`), 150);
+}
+function showLevel(ctx) {
+  const c = contexts.get(ctx);
+  const pct = Math.round((status.get(c.widgetId) || 0) / 2.55);
+  const sign = c.step > 0 ? '+' : c.step < 0 ? '−' : '';
+  const title = `${c.label}${sign ? ' ' + sign : ''}\n${pct} %`;
+  if (title !== c.title) { c.title = title; sdSend({ event: 'setTitle', context: ctx, payload: { title } }); }
+}
+
 function setKeyState(ctx, force) {
   const c = contexts.get(ctx);
   if (!c) return;
+  if (c.level) return showLevel(ctx);
   const v = status.get(c.widgetId) || 0;
   const st = v === 255 ? 1 : 0;          // cadre seulement si le bouton est vraiment actif (pas « surveillé »)
   if (st !== c.state || force) {
@@ -167,7 +206,7 @@ function onQlc(msg) {
     }
     return;
   }
-  if (p[1] === 'BUTTON' && p.length >= 3) updateStatus(p[0], parseInt(p[2], 10) || 0);
+  if ((p[1] === 'BUTTON' || p[1] === 'SLIDER') && p.length >= 3) updateStatus(p[0], parseInt(p[2], 10) || 0);
 }
 
 function updateStatus(id, v) {

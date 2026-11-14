@@ -1,6 +1,6 @@
 {
   "Name": "QLC+ Show",
-  "Version": "1.0.1.0",
+  "Version": "1.1.0.0",
   "Author": "LeQueb",
   "Description": "Contrôle les boutons du Virtual Console de QLC+ par l'accès web : pas besoin que QLC+ soit en avant-plan, les touches s'allument quand le bouton est actif.",
   "UUID": "ca.lequeb.qlcplus",
@@ -48,6 +48,22 @@
         }
       ],
       "DisableAutomaticStates": true
+    },
+    {
+      "UUID": "ca.lequeb.qlcplus.level",
+      "Name": "Niveau QLC+ (fader)",
+      "Icon": "imgs/action",
+      "Tooltip": "Monte ou descend un fader / bouton rotatif de QLC+ et affiche son niveau",
+      "SupportedInMultiActions": true,
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/key_off",
+          "TitleAlignment": "middle"
+        }
+      ]
     }
   ]
 }

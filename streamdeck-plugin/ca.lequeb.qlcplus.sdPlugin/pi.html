@@ -18,11 +18,19 @@
   <select id="widget"><option value="">— choisir —</option></select>
   <label for="id">ou numéro (ID) du bouton</label>
   <input id="id" type="number" min="0" placeholder="ex. 129">
+  <div id="lvl" style="display:none">
+    <label for="step">Pas (%) : +10 monte, -10 descend, 0 = affiche seulement</label>
+    <input id="step" type="number" step="1" placeholder="10">
+    <label for="label">Nom affiché</label>
+    <input id="label" placeholder="FOH">
+  </div>
+  <div id="btnmode">
   <label for="mode">Comportement</label>
   <select id="mode">
     <option value="">Appui (comme un clic sur le board)</option>
     <option value="hold">Maintenu (allumé tant que la touche est tenue)</option>
   </select>
+  </div>
   <label for="host">Adresse de QLC+</label>
   <input id="host" placeholder="127.0.0.1:9999">
   <button id="reload">Recharger la liste</button>
@@ -36,6 +44,8 @@ function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
 function save() {
   settings.widgetId = $('id').value;
   settings.mode = $('mode').value;
+  settings.step = $('step').value;
+  settings.label = $('label').value;
   send({ event: 'setSettings', context: uuid, payload: settings });
 }
 function fill() {
@@ -50,6 +60,8 @@ function fill() {
   sel.value = list.some((w) => w.id === cur) ? cur : '';
   $('id').value = cur;
   $('mode').value = settings.mode || '';
+  $('step').value = settings.step || '';
+  $('label').value = settings.label || '';
 }
 
 // appelé par le logiciel Stream Deck
@@ -57,6 +69,9 @@ function connectElgatoStreamDeckSocket(port, inUUID, registerEvent, info, action
   uuid = inUUID;
   const a = JSON.parse(actionInfo);
   action = a.action;
+  const isLevel = action.endsWith('.level');
+  $('lvl').style.display = isLevel ? 'block' : 'none';
+  $('btnmode').style.display = isLevel ? 'none' : 'block';
   settings = (a.payload && a.payload.settings) || {};
   ws = new WebSocket('ws://127.0.0.1:' + port);
   ws.onopen = () => {
@@ -85,6 +100,8 @@ function connectElgatoStreamDeckSocket(port, inUUID, registerEvent, info, action
 $('widget').onchange = () => { $('id').value = $('widget').value; save(); };
 $('id').onchange = () => { save(); fill(); };
 $('mode').onchange = save;
+$('step').onchange = save;
+$('label').onchange = save;
 $('host').onchange = () => {
   send({ event: 'setGlobalSettings', context: uuid, payload: { host: $('host').value.trim() || '127.0.0.1:9999' } });
   setTimeout(() => send({ event: 'sendToPlugin', context: uuid, action, payload: { cmd: 'list' } }), 1500);

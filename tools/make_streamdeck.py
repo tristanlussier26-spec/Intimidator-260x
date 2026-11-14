@@ -167,6 +167,18 @@ onoff = keyed("Alt+Shift+", "KLMNOPQRST")       # strobes, bumps, flashs (tant q
 quick_pos = [btn("Shift+D", "→ CHAN-\nTEUR"), btn("Shift+C", "→ BAND"), btn("Shift+B", "→ PUBLIC")]
 
 foh70, foh40 = btn("Alt+7", "FOH\n70 %"), btn("Alt+4", "FOH\n40 %")
+sliders = {sl.get("Caption"): sl.get("ID") for sl in tree.getroot().iter(f"{{{NS['q']}}}Slider")}
+FOH_COL = 0xF2D8A0
+
+
+def level(cap, step):
+    """touche « Niveau » du plugin sur le fader/bouton rotatif `cap` (step % par appui, 0 = affichage)"""
+    sign = " +" if step > 0 else " −" if step < 0 else ""
+    return ("level", f"{cap}{sign}\n0 %", (sliders[cap], step, cap), FOH_COL)
+
+
+def level_row(cap):
+    return [level(cap, -10), level(cap, 0), level(cap, 10)]
 lekos = [btn(f"Ctrl+{i}", f"LEKO {i}") for i in (1, 2, 3)]
 
 page("1 SHOW", look_row("") + [auto, TAP] + onoff + quick_pos + [foh70, foh40, None] + [fondu, blackout])
@@ -176,6 +188,11 @@ page("4 TÊTES", keyed("Ctrl+Shift+", "ABCDEFGHIJ") + keyed("Ctrl+Shift+", "KLMN
      + keyed("Ctrl+Shift+", "TUVWY") + [None, None, None, TAP, None, fondu, blackout])
 page("5 POSITIONS", keyed("Shift+", "ABCDEFGHIJK") + [None] * 5 + keyed("Shift+", "LMNOPQ")
      + [None, None, TAP, None, fondu, blackout])
+
+page("6 FOH", [foh70, foh40, None] + lekos + [None, None]
+     + level_row("FOH") + [None] + level_row("L1") + [None]
+     + level_row("L2") + [None] + level_row("L3") + [None]
+     + [None, None, None, None, fondu, blackout])
 
 # ------------------------------------------------------------ écriture
 prof_uuid = str(uuid.uuid4()).upper()
@@ -215,7 +232,14 @@ for pid, name, grid in pages:
             return {"Image": img_name, "Title": wrap(title), "ShowTitle": True, "TitleAlignment": "middle",
                     "TitleColor": text_color(col if on else dim), "FontSize": 9, "FontStyle": "Bold",
                     "FontFamily": "", "FontUnderline": False, "OutlineThickness": 2}
-        if kind == "hotkey":
+        if kind == "level":
+            wid, step, cap = target
+            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": False, "Name": "Niveau QLC+ (fader)",
+                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.0.0"},
+                                   "Settings": {"widgetId": wid, "step": str(step), "label": cap}, "State": 0,
+                                   "States": [st(f"Images/k{c}{r}.png", step == 0)],
+                                   "UUID": PLUGIN + ".level"}
+        elif kind == "hotkey":
             actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Hotkey",
                                    "Settings": hotkey_settings(target), "State": 0,
                                    "States": [st(f"Images/k{c}{r}.png", True)],
@@ -223,7 +247,7 @@ for pid, name, grid in pages:
         else:
             wid, mode = target
             actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Bouton QLC+",
-                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.0.1.0"},
+                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.0.0"},
                                    "Settings": {"widgetId": wid, "mode": mode}, "State": 0,
                                    "States": [st(f"Images/k{c}{r}.png", False), st(f"Images/k{c}{r}on.png", True)],
                                    "UUID": PLUGIN + ".button"}
