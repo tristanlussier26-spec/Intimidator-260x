@@ -407,7 +407,7 @@ SPOT = {  # cibles (x px, y px, hauteur pi)
 }
 
 
-def aim(head, target):
+def aim(head, target, pan_offset=0.0):
     """(pan, tilt) DMX pour viser target depuis head.
     Calibration observée : pan 128 + tilt < 128 => faisceau vers +x (mur côté guitare)."""
     import math
@@ -420,7 +420,7 @@ def aim(head, target):
     best = None
     for off, tsign in ((0, -1), (180, 1), (-180, 1)):                 # deux façons d'y arriver
         for wrap in (-360, 0, 360):
-            pan = 128 + PAN_SIGN * (phi - off + wrap) * 255 / PAN_DEG
+            pan = 128 + PAN_SIGN * (phi - off + wrap + pan_offset) * 255 / PAN_DEG
             tilt = 128 + tsign * theta * 255 / TILT_DEG
             if 0 <= pan <= 255 and 0 <= tilt <= 255:
                 # même « branche » pour toutes les têtes (tilt < 128) : pas de demi-tour entre positions
@@ -432,12 +432,15 @@ def aim(head, target):
 # Têtes dont le pan tourne à l'envers (montage ou réglage « pan reverse » dans le menu de la tête).
 # Mettre True pour une tête dont le pan tourne à l'envers.
 PAN_INVERT = [False, False, False, False]
+# Tête montée tournée d'un demi-tour (sa base regarde dans l'autre sens) : +180° de pan.
+# Tête 1 : éclairait derrière la scène au lieu de la scène (constaté dans la salle).
+PAN_TURN = [180, 0, 0, 0]
 
 
 def aim_all(targets):
     out = []
     for i, (h, t) in enumerate(zip(HEAD_PX, targets)):
-        pan, tilt = aim(h, t)
+        pan, tilt = aim(h, t, PAN_TURN[i])
         out.append((255 - pan if PAN_INVERT[i] else pan, tilt))
     return out
 
