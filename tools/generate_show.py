@@ -330,6 +330,13 @@ flash_blue = scene("PAR Flash bleu", "PAR/Flash", full(PARS, {P_DIM: 255, P_B: 2
 flash_uv = scene("PAR Flash UV", "PAR/Flash", full(PARS, {P_DIM: 255, P_UV: 255}))
 strobe_rand = matrix("PAR Strobe aléatoire", "Random Single", 0xFFFFFF, duration=40)
 
+# ================================================================ FOH (lekos, hors du show)
+FOH_FADE = 1500
+foh_70 = scene("FOH lekos 70 %", "FOH", {FOH: {c: FOH_MAX for c in range(FOH_LEKOS)}}, FOH_FADE, FOH_FADE)
+foh_40 = scene("FOH lekos 40 %", "FOH", {FOH: {c: round(255 * .40) for c in range(FOH_LEKOS)}}, FOH_FADE, FOH_FADE)
+foh_l = [scene(f"FOH leko {i + 1} 70 %", "FOH", {FOH: {i: FOH_MAX}}, FOH_FADE, FOH_FADE) for i in range(FOH_LEKOS)]
+assert all(v <= FOH_MAX for v in (FOH_MAX, round(255 * .40)))
+
 # ================================================================ Têtes
 HEAD_COLORS = [("Blanc", 3, 0xF0F0F0), ("Rouge", 10, 0xD01010), ("Orange", 17, 0xFF7A10),
                ("Jaune", 24, 0xF0E010), ("Vert", 31, 0x10B030), ("Bleu", 38, 0x1030E0),
@@ -645,10 +652,15 @@ b = button(f, "FONDU\nAU NOIR", NO_FUNC, 568, 191, 95, 72, "StopAll", 0x602020, 
 b.find("Action").set("FadeOut", "2000")
 
 # --- FOH : lekos, jamais plus de 70 %
-f = frame(root, "FOH — LEKOS (max 70 %)", 1260, 613, 290, 125, bg=0x1A2430)
-level_slider(f, "FOH", [(FOH, c) for c in range(FOH_LEKOS)], 8, 32, w=66, h=88, value=0, high=FOH_MAX, style="Knob")
+f = frame(root, "FOH — LEKOS (max 70 %)", 1260, 568, 290, 170, bg=0x1A2430)
+level_slider(f, "FOH", [(FOH, c) for c in range(FOH_LEKOS)], 8, 28, w=66, h=74, value=0, high=FOH_MAX, style="Knob")
 for i in range(FOH_LEKOS):
-    level_slider(f, f"L{i + 1}", [(FOH, i)], 78 + i * 68, 32, w=66, h=88, value=0, high=FOH_MAX, style="Knob")
+    level_slider(f, f"L{i + 1}", [(FOH, i)], 78 + i * 68, 28, w=66, h=74, value=0, high=FOH_MAX, style="Knob")
+# touches : un appui = allumé (fondu 1,5 s), un 2e appui = éteint. Jamais plus de 70 %.
+for i, (cap, fid_, key) in enumerate([("FOH\n70 %", foh_70, "Alt+7"), ("FOH\n40 %", foh_40, "Alt+4"),
+                                      ("L1", foh_l[0], "Ctrl+1"), ("L2", foh_l[1], "Ctrl+2"),
+                                      ("L3", foh_l[2], "Ctrl+3")]):
+    button(f, cap, fid_, 8 + i * 56, 108, 52, 54, "Toggle", 0xF2D8A0, key)
 
 # --- Têtes
 f = frame(root, "TÊTES — COULEUR", 690, 258, 560, 175, solo=True)
@@ -665,7 +677,7 @@ grid(f, [(n, pos[n], 0x204060) for n, _ in POSITIONS], cols=6, w=88, keys=L("Shi
 
 xy = ET.SubElement(root, "XYPad", {"Caption": "VISER EN LIVE (4 têtes)", "ID": wid(),
                                    "InvertedAppearance": "0"})
-winstate(xy, 1260, 443, 290, 165)
+winstate(xy, 1260, 443, 290, 120)
 appearance(xy)
 for h in HEADS:
     fx = ET.SubElement(xy, "Fixture", {"ID": str(h), "Head": "0"})

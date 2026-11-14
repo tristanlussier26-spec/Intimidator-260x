@@ -51,7 +51,11 @@ Relance la même commande pour mettre à jour après un changement sur le GitHub
 - Les MOSFiATA sont en mode couleurs seulement (Generic RGB, inclus dans QLC+). Leur strobe est fait par QLC+ (clignotement).
 - Les U`King sont en 8 canaux : dimmer, R, G, B, W, strobe, fonction, vitesse. Leur profil `UKing-ZQ01061-RGBW-Par.qxf` doit être **à côté de `Show-Rock.qxw`** (le script d'installation le met là). La scène BASE garde strobe et fonction à 0, et le dimmer suit le fader PAR.
 - **M7 et M8 éclairent le public** : ils restent éteints dans les couleurs et les looks, et ne s'allument qu'avec le blinder, les strobes, les bumps et les flashs.
-- **Lekos FOH** : hors du show. Aucun look, effet, flash ni blinder n'y touche. On les contrôle seulement avec les boutons rotatifs du cadre **FOH — LEKOS** (FOH = les 3 ensemble, L1 à L3 = chacun), plafonnés à **70 %** (valeur DMX 178). Sur le DMX-4 : mode DMX, adresse `R150`, sorties en dimmer (pas en switch). Le BLACKOUT les coupe aussi ; FONDU AU NOIR ne les touche pas.
+- **Lekos FOH** : hors du show. Aucun look, effet, flash ni blinder n'y touche. On les contrôle seulement avec le cadre **FOH — LEKOS**, tout plafonné à **70 %** (valeur DMX 178) :
+  - touches (un appui = allumé en fondu 1,5 s, 2e appui = éteint) : **FOH 70 %** `Alt+7`, **FOH 40 %** `Alt+4`, **L1** `Ctrl+1`, **L2** `Ctrl+2`, **L3** `Ctrl+3` ;
+  - boutons rotatifs pour doser : FOH (les 3) et L1 à L3 ;
+  - Stream Deck : FOH 70 % et FOH 40 % sur la page 1 SHOW ; FOH 70 % et LEKO 1-3 sur la page 2 LOOKS ;
+  - si plusieurs commandes sont actives, c'est la plus haute qui gagne, jamais plus de 70 %. Sur le DMX-4 : mode DMX, adresse `R150`, sorties en dimmer (pas en switch). Le BLACKOUT les coupe aussi. FONDU AU NOIR éteint les touches FOH, mais pas les boutons rotatifs.
 - Toutes les couleurs du show (ambre, blanc chaud, UV…) sont converties automatiquement en RGB ou RGBW.
 - À vérifier à la réception : dans le manuel MOSFiATA, le mode 3 canaux doit être rouge, vert, bleu dans cet ordre. Sinon, change `MOS_MODEL` dans `tools/generate_show.py` (ex. mode `GRB`).
 

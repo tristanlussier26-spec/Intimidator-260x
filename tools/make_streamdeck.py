@@ -166,8 +166,11 @@ fondu, blackout = btn("N", "FONDU\nNOIR"), btn("X", "BLACK-\nOUT")
 onoff = keyed("Alt+Shift+", "KLMNOPQRST")       # strobes, bumps, flashs (tant que tenus)
 quick_pos = [btn("Shift+D", "→ CHAN-\nTEUR"), btn("Shift+C", "→ BAND"), btn("Shift+B", "→ PUBLIC")]
 
-page("1 SHOW", look_row("") + [auto, TAP] + onoff + quick_pos + [None] * 3 + [fondu, blackout])
-page("2 LOOKS", look_row("Shift+") + look_row("Ctrl+") + [auto, TAP, None, None, None, None, fondu, blackout])
+foh70, foh40 = btn("Alt+7", "FOH\n70 %"), btn("Alt+4", "FOH\n40 %")
+lekos = [btn(f"Ctrl+{i}", f"LEKO {i}") for i in (1, 2, 3)]
+
+page("1 SHOW", look_row("") + [auto, TAP] + onoff + quick_pos + [foh70, foh40, None] + [fondu, blackout])
+page("2 LOOKS", look_row("Shift+") + look_row("Ctrl+") + [auto, TAP, foh70] + lekos + [fondu, blackout])
 page("3 PAR", keyed("Alt+", "ABCDEFGHIJKLMNOPQRST") + keyed("Alt+Shift+", "ABCDEFGHIJ"))
 page("4 TÊTES", keyed("Ctrl+Shift+", "ABCDEFGHIJ") + keyed("Ctrl+Shift+", "KLMNOPQR")
      + keyed("Ctrl+Shift+", "TUVWY") + [None, None, None, TAP, None, fondu, blackout])
