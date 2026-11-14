@@ -150,6 +150,15 @@ def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 
     return fid
 
 
+# ================================================================ BASE (anti-bug)
+# Canaux « LTP » (strobe, prisme, rotation...) gardent leur dernière valeur quand un flash
+# ou un bouton s'arrête. BASE tourne en permanence (démarrage auto + dans chaque look) et
+# fournit la valeur de repli : strobe PAR fermé, prisme off, rotation off, shutter têtes fermé.
+base = scene("BASE (toujours active)", "Système",
+             {**{p: {P_STROBE: 0, P_PROG: 0, P_SPEED: 0, P_32B: 0} for p in PARS},
+              **{h: {H_STROBE: 0, H_PRISM: 0, H_GROT: 0, H_FUNC: 0, H_MACRO: 0} for h in HEADS}})
+engine.set("Autostart", str(base))
+
 # ================================================================ PAR
 COLOR_FADE = 400       # ms : fondu entre deux couleurs PAR
 CH6 = (P_R, P_G, P_B, P_A, P_W, P_UV)
@@ -174,7 +183,7 @@ PC = {n: c for n, c, _ in PAR_COLORS}
 par_color_ids = {}
 for name, c, _ in PAR_COLORS:
     par_color_ids[name] = scene(f"PAR {name}", "PAR/Couleurs",
-                                {p: dict(zip(CH6, c)) for p in PARS}, COLOR_FADE, COLOR_FADE)
+                                {p: {**dict(zip(CH6, c)), P_STROBE: 0} for p in PARS}, COLOR_FADE, COLOR_FADE)
 
 
 def split(name, c1, c2):
@@ -249,14 +258,14 @@ HEAD_COLORS = [("Blanc", 3, 0xF0F0F0), ("Rouge", 10, 0xD01010), ("Orange", 17, 0
 head_color = {}
 for name, val, _ in HEAD_COLORS:
     head_color[name] = scene(f"Têtes {name}", "Têtes/Couleurs",
-                             {h: {H_COLOR: val, H_STROBE: H_SHUTTER_OPEN, H_FUNC: 0, H_MACRO: 0}
+                             {h: {H_COLOR: val, H_STROBE: H_SHUTTER_OPEN, H_PRISM: 0, H_FUNC: 0, H_MACRO: 0}
                               for h in HEADS})
 
 GOBOS = [("Ouvert", 3)] + [(f"Gobo {i}", 3 + 8 * i) for i in range(1, 8)]
 gobo = {}
 for name, val in GOBOS:
     gobo[name] = scene(f"Têtes {name}", "Têtes/Gobos",
-                       {h: {H_GOBO: val, H_GROT: 0, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN}
+                       {h: {H_GOBO: val, H_GROT: 0, H_PRISM: 0, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN}
                         for h in HEADS})
 gobo_rot = scene("Têtes Rotation gobo", "Têtes/FX", {h: {H_GROT: 40} for h in HEADS})
 gobo_rot_fast = scene("Têtes Rotation rapide", "Têtes/FX", {h: {H_GROT: 100} for h in HEADS})
@@ -343,8 +352,8 @@ LOOKS2 = [
     ("APOTHÉOSE", 0xFFF0D0, [FX["Arc-en-ciel"], head_color["Blanc"], gobo["Ouvert"], prism,
                              pos["Éventail"], MOVES["Ballyhoo"]]),
 ]
-look_ids = [(n, bg, collection(f"LOOK {n}", "Looks", m)) for n, bg, m in LOOKS]
-look2_ids = [(n, bg, collection(f"LOOK {n}", "Looks", m)) for n, bg, m in LOOKS2]
+look_ids = [(n, bg, collection(f"LOOK {n}", "Looks", [base] + m)) for n, bg, m in LOOKS]
+look2_ids = [(n, bg, collection(f"LOOK {n}", "Looks", [base] + m)) for n, bg, m in LOOKS2]
 _all_looks = dict((n, i) for n, _, i in look_ids + look2_ids)
 auto_mode = chaser("AUTO — enchaîne les looks", "Looks",
                    [_all_looks[n] for n in ("COUPLET", "PRÉ-REFRAIN", "REFRAIN", "GROS REFRAIN", "FEU",
