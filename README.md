@@ -99,34 +99,43 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 
 ## Stream Deck
 
-### Profil prêt à importer (Stream Deck XL)
+### Plugin QLC+ Show + profil XL
 ![Aperçu Stream Deck](show/apercu-streamdeck.png)
 
-1. Télécharge **`show/Show-Rock-XL.streamDeckProfile`**.
-2. Double-clique dessus (ou Stream Deck → Préférences → Profils → Importer).
-3. Choisis le profil **Show Rock (QLC+)** pour ton XL.
+Le Stream Deck contrôle QLC+ **par son accès web** grâce au plugin `QLC+ Show` (dossier `streamdeck-plugin/`).
+- QLC+ n'a **pas besoin d'être en avant-plan**.
+- Une touche **s'allume** (cadre blanc) quand son bouton est actif dans QLC+, même s'il a été lancé ailleurs.
+- L'appui et le relâchement sont envoyés séparément, donc les strobes, le blinder, les bumps et les flashs restent **allumés tant que la touche est tenue** et s'éteignent dès que tu lâches.
+- Le plugin se reconnecte tout seul si QLC+ est fermé puis rouvert.
+
+**Installation (une fois)**
+1. Double-clique **`show/QLC-Plus-Show.streamDeckPlugin`**. Le logiciel Stream Deck l'installe.
+2. Double-clique **`show/Show-Rock-XL.streamDeckProfile`**, puis choisis le profil **Show Rock (QLC+)** pour ton XL.
+
+**À chaque show**
+- Lance QLC+ avec **`show/Lancer-QLC.bat`** (QLC+ avec `-w` pour l'accès web, `-p` pour le mode show, et le show chargé).
+- Si QLC+ est installé ailleurs que `C:\QLC+`, corrige le chemin dans le .bat.
+
+**Réglage d'une touche** (glisse **QLC+ Show → Bouton QLC+** sur une touche) :
+- choisis le bouton dans la liste du board, ou tape son ID ;
+- comportement **Appui** = comme un clic sur le board, ou **Maintenu** = allumé tant que la touche est tenue ;
+- l'adresse de QLC+ est `127.0.0.1:9999` par défaut. Tu peux mettre l'IP d'un autre PC.
 
 **5 pages** (◀ PAGE / PAGE ▶ en bas à droite de chaque page) :
-1. **SHOW** : les 10 looks de la rangée 1, AUTO, TAP, strobes, bumps et flashs, 3 positions rapides, FONDU, BLACKOUT
+1. **SHOW** : les 10 looks de la rangée 1, AUTO, TAP, strobes, blinder, bumps et flashs (maintenus), 3 positions rapides, FONDU, BLACKOUT
 2. **LOOKS** : les 20 autres looks
 3. **PAR** : 20 couleurs et 10 effets
 4. **TÊTES** : couleurs, gobos, rotation, prisme, chases
 5. **POSITIONS** : 11 positions et 6 mouvements
 
-Le Stream Deck envoie une **impulsion** (pas de « maintenir ») :
-toute la section Stream Deck est en **kicks** : un appui = un coup bref qui s'éteint tout seul.
-- **strobe PAR, strobe têtes, strobe fou** = rafale de 1 s qui coupe net (`STROBE_KICK`) ;
-- **blinder** = coup de 250 ms puis fondu ;
-- **bumps gauche/droite, flashs rouge/bleu/UV/têtes** = coup bref puis fondu (`KICK_HOLD` / `KICK_FADE`).
+**TAP** reste un raccourci clavier (`T`), car QLC+ ne permet pas de taper le tempo par le web. Pour TAP seulement, QLC+ doit être en avant-plan.
 
-Le profil est généré par `tools/make_streamdeck.py` à partir du show : relance-le après chaque changement de raccourcis.
+Le profil est généré par `tools/make_streamdeck.py` à partir du show (IDs des boutons). Relance-le après chaque `generate_show.py`, puis réimporte-le.
 
-### Les raccourcis
-Chaque bouton du board a un raccourci clavier. Sur le Stream Deck : glisse l'action **Système → Raccourci (Hotkey)** sur une touche et tape la combinaison du tableau.
-
-- QLC+ doit être **en avant-plan** et en **mode show (▶)** : le raccourci va à la fenêtre active.
-- Astuce : mets le nom du look et sa couleur comme titre/fond de la touche Stream Deck.
-- Sur le board (souris/clavier), les flashs `S B D F G-M` marchent tant que la touche est tenue ; sur le Stream Deck, utilise les KICKS.
+### Les raccourcis clavier
+Chaque bouton du board a aussi un raccourci clavier, pratique au clavier ou sans le plugin. QLC+ doit alors être **en avant-plan** et en **mode show (▶)**.
+- Les flashs `S B D F G-M` marchent tant que la touche du clavier est tenue.
+- Les touches `Alt+Shift+K…T` (cadre STREAM DECK) sont en on/off au clavier ; le plugin les rend « maintenues ».
 
 
 **LOOKS DU SHOW — un bouton = tout le rig  **

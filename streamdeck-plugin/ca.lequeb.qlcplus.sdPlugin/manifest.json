@@ -1,0 +1,52 @@
+{
+  "Name": "QLC+ Show",
+  "Version": "1.0.0.0",
+  "Author": "LeQueb",
+  "Description": "Contrôle les boutons du Virtual Console de QLC+ par l'accès web : pas besoin que QLC+ soit en avant-plan, les touches s'allument quand le bouton est actif.",
+  "UUID": "ca.lequeb.qlcplus",
+  "Icon": "imgs/plugin",
+  "Category": "QLC+ Show",
+  "CategoryIcon": "imgs/category",
+  "CodePath": "plugin.js",
+  "PropertyInspectorPath": "pi.html",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "6.5"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    },
+    {
+      "Platform": "mac",
+      "MinimumVersion": "12"
+    }
+  ],
+  "Nodejs": {
+    "Version": "20",
+    "Debug": "disabled"
+  },
+  "Actions": [
+    {
+      "UUID": "ca.lequeb.qlcplus.button",
+      "Name": "Bouton QLC+",
+      "Icon": "imgs/action",
+      "Tooltip": "Appuie sur un bouton du Virtual Console de QLC+",
+      "SupportedInMultiActions": true,
+      "Controllers": [
+        "Keypad"
+      ],
+      "States": [
+        {
+          "Image": "imgs/key_off",
+          "TitleAlignment": "middle"
+        },
+        {
+          "Image": "imgs/key_on",
+          "TitleAlignment": "middle"
+        }
+      ]
+    }
+  ]
+}

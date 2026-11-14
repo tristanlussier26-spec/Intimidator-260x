@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<style>
+  body { background: #2d2d2d; color: #d8d8d8; font: 12px -apple-system, "Segoe UI", sans-serif; margin: 0; padding: 8px 12px; }
+  label { display: block; margin: 10px 0 4px; color: #9a9a9a; }
+  select, input, button { width: 100%; box-sizing: border-box; background: #3d3d3d; color: #fff;
+    border: 1px solid #555; border-radius: 3px; padding: 5px; font: inherit; }
+  button { margin-top: 8px; cursor: pointer; }
+  #state { margin-top: 10px; font-weight: bold; }
+  .ok { color: #4caf50; } .ko { color: #ff6b6b; }
+  small { color: #888; display: block; margin-top: 6px; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <label for="widget">Bouton du board QLC+</label>
+  <select id="widget"><option value="">— choisir —</option></select>
+  <label for="id">ou numéro (ID) du bouton</label>
+  <input id="id" type="number" min="0" placeholder="ex. 129">
+  <label for="mode">Comportement</label>
+  <select id="mode">
+    <option value="">Appui (comme un clic sur le board)</option>
+    <option value="hold">Maintenu (allumé tant que la touche est tenue)</option>
+  </select>
+  <label for="host">Adresse de QLC+</label>
+  <input id="host" placeholder="127.0.0.1:9999">
+  <button id="reload">Recharger la liste</button>
+  <div id="state"></div>
+  <small>QLC+ doit être lancé avec l'accès web (-w) et en mode show (▶). Le fichier Lancer-QLC.bat le fait pour toi.</small>
+<script>
+let ws, uuid, action, settings = {}, list = [];
+const $ = (id) => document.getElementById(id);
+
+function send(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); }
+function save() {
+  settings.widgetId = $('id').value;
+  settings.mode = $('mode').value;
+  send({ event: 'setSettings', context: uuid, payload: settings });
+}
+function fill() {
+  const sel = $('widget');
+  const cur = String(settings.widgetId || '');
+  sel.innerHTML = '<option value="">— choisir —</option>';
+  for (const w of list) {
+    const o = document.createElement('option');
+    o.value = w.id; o.textContent = `${w.name.replace(/\n/g, ' ')}  (#${w.id})`;
+    sel.appendChild(o);
+  }
+  sel.value = list.some((w) => w.id === cur) ? cur : '';
+  $('id').value = cur;
+  $('mode').value = settings.mode || '';
+}
+
+// appelé par le logiciel Stream Deck
+function connectElgatoStreamDeckSocket(port, inUUID, registerEvent, info, actionInfo) {
+  uuid = inUUID;
+  const a = JSON.parse(actionInfo);
+  action = a.action;
+  settings = (a.payload && a.payload.settings) || {};
+  ws = new WebSocket('ws://127.0.0.1:' + port);
+  ws.onopen = () => {
+    send({ event: registerEvent, uuid });
+    send({ event: 'getGlobalSettings', context: uuid });
+    send({ event: 'sendToPlugin', context: uuid, action, payload: { cmd: 'list' } });
+    fill();
+  };
+  ws.onmessage = (e) => {
+    const m = JSON.parse(e.data);
+    if (m.event === 'sendToPropertyInspector') {
+      list = m.payload.widgets || [];
+      $('host').placeholder = m.payload.host || '127.0.0.1:9999';
+      $('state').textContent = m.payload.connected ? '● Connecté à QLC+' : '● QLC+ introuvable';
+      $('state').className = m.payload.connected ? 'ok' : 'ko';
+      fill();
+    } else if (m.event === 'didReceiveGlobalSettings') {
+      $('host').value = (m.payload.settings && m.payload.settings.host) || '';
+    } else if (m.event === 'didReceiveSettings') {
+      settings = m.payload.settings || {};
+      fill();
+    }
+  };
+}
+
+$('widget').onchange = () => { $('id').value = $('widget').value; save(); };
+$('id').onchange = () => { save(); fill(); };
+$('mode').onchange = save;
+$('host').onchange = () => {
+  send({ event: 'setGlobalSettings', context: uuid, payload: { host: $('host').value.trim() || '127.0.0.1:9999' } });
+  setTimeout(() => send({ event: 'sendToPlugin', context: uuid, action, payload: { cmd: 'list' } }), 1500);
+};
+$('reload').onclick = () => {
+  send({ event: 'sendToPlugin', context: uuid, action, payload: { cmd: 'reload' } });
+  setTimeout(() => send({ event: 'sendToPlugin', context: uuid, action, payload: { cmd: 'list' } }), 600);
+};
+</script>
+</body>
+</html>

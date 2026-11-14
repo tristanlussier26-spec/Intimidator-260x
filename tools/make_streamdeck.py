@@ -2,7 +2,9 @@
 """
 Génère show/Show-Rock-XL.streamDeckProfile (Stream Deck XL, 32 touches) à partir de Show-Rock.qxw.
 
-Chaque touche envoie le raccourci clavier du bouton QLC+ correspondant (action Système → Raccourci).
+Chaque touche utilise le plugin « QLC+ Show » (streamdeck-plugin/) : elle appuie directement sur le bouton
+du Virtual Console par l'accès web de QLC+ (ID du widget). Seul TAP reste un raccourci clavier
+(QLC+ n'expose pas le tap tempo par le web).
 Les touches et les couleurs sont lues dans le .qxw : relancer après generate_show.py.
 
     python3 tools/make_streamdeck.py
@@ -22,6 +24,7 @@ OUT = os.path.join(HERE, "..", "show", "Show-Rock-XL.streamDeckProfile")
 MODEL = "20GAT9901"            # Stream Deck XL
 COLS, ROWS = 8, 4
 NS = {"q": "http://www.qlcplus.org/Workspace"}
+PLUGIN = "ca.lequeb.qlcplus"
 
 # ------------------------------------------------------------ lecture du show
 keys = {}                      # raccourci -> (caption une ligne, bg int|None)
@@ -32,7 +35,7 @@ for b in tree.getroot().iter("{%s}Button" % NS["q"]):
         continue
     bg = b.find("q:Appearance/q:BackgroundColor", NS)
     col = int(bg.text) & 0xFFFFFF if bg is not None and bg.text != "Default" else None
-    keys[k.text] = (b.get("Caption").replace("\n", " "), col)
+    keys[k.text] = (b.get("Caption").replace("\n", " "), col, b.get("ID"))
 tap_key = None
 for sd in tree.getroot().iter("{%s}SpeedDial" % NS["q"]):
     k = sd.find("q:Key", NS)
@@ -40,9 +43,12 @@ for sd in tree.getroot().iter("{%s}SpeedDial" % NS["q"]):
         tap_key = k.text
 
 
+HOLD = {f"Alt+Shift+{c}" for c in "KLMNOPQRST"}     # strobes / bumps / flashs : allumés tant que tenus
+
+
 def btn(key, title=None):
-    caption, col = keys[key]
-    return ("hotkey", title or caption, key, col)
+    caption, col, wid = keys[key]
+    return ("qlc", title or caption, (wid, "hold" if key in HOLD else ""), col)
 
 
 TAP = ("hotkey", "TAP\ntempo", tap_key, 0x00A060)
@@ -71,12 +77,17 @@ def hotkey_settings(seq):
 
 
 # ------------------------------------------------------------ images
-def icon(col, folder=False):
+def icon(col, folder=False, on=False):
     col = 0x333333 if col is None else col
     rgb = ((col >> 16) & 255, (col >> 8) & 255, col & 255)
     im = Image.new("RGB", (288, 288), (0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle((10, 10, 278, 278), radius=46, fill=rgb)
+    if on:                                       # touche active : cadre blanc épais
+        d.rounded_rectangle((0, 0, 287, 287), radius=52, fill=(255, 255, 255))
+        d.rounded_rectangle((22, 22, 265, 265), radius=38, fill=rgb)
+    else:
+        rgb = tuple(int(c * 0.55) for c in rgb)  # touche au repos : un peu plus sombre
+        d.rounded_rectangle((10, 10, 278, 278), radius=46, fill=rgb)
     if folder:                                   # petit onglet de dossier
         d.rounded_rectangle((40, 30, 140, 70), radius=14, fill=tuple(min(255, c + 60) for c in rgb))
     buf = io.BytesIO()
@@ -152,7 +163,7 @@ def keyed(prefix, letters):
 
 auto = btn("F11", "▶ AUTO")
 fondu, blackout = btn("N", "FONDU\nNOIR"), btn("X", "BLACK-\nOUT")
-onoff = keyed("Alt+Shift+", "KLMNOPQRST")       # strobes, bumps, flashs (on/off)
+onoff = keyed("Alt+Shift+", "KLMNOPQRST")       # strobes, bumps, flashs (tant que tenus)
 quick_pos = [btn("Shift+D", "→ CHAN-\nTEUR"), btn("Shift+C", "→ BAND"), btn("Shift+B", "→ PUBLIC")]
 
 page("1 SHOW", look_row("") + [auto, TAP] + onoff + quick_pos + [None] * 3 + [fondu, blackout])
@@ -193,14 +204,26 @@ for pid, name, grid in pages:
                 "UUID": "com.elgato.streamdeck.page." + ("previous" if it[0] == "prev" else "next")}
             continue
         kind, title, target, col = it
-        img = f"Images/k{c}{r}.png"
-        zf.writestr(f"{pdir}/{img}", icon(col))
-        state = {"Image": img, "Title": wrap(title), "ShowTitle": True, "TitleAlignment": "middle",
-                 "TitleColor": text_color(col), "FontSize": 9, "FontStyle": "Bold",
-                 "FontFamily": "", "FontUnderline": False, "OutlineThickness": 2}
-        actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Hotkey",
-                               "Settings": hotkey_settings(target), "State": 0, "States": [state],
-                               "UUID": "com.elgato.streamdeck.system.hotkey"}
+
+        def st(img_name, on):
+            zf.writestr(f"{pdir}/{img_name}", icon(col, on=on))
+            dim = None if col is None else (int(((col >> 16) & 255) * .55) << 16 | int(((col >> 8) & 255) * .55) << 8
+                                            | int((col & 255) * .55))
+            return {"Image": img_name, "Title": wrap(title), "ShowTitle": True, "TitleAlignment": "middle",
+                    "TitleColor": text_color(col if on else dim), "FontSize": 9, "FontStyle": "Bold",
+                    "FontFamily": "", "FontUnderline": False, "OutlineThickness": 2}
+        if kind == "hotkey":
+            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Hotkey",
+                                   "Settings": hotkey_settings(target), "State": 0,
+                                   "States": [st(f"Images/k{c}{r}.png", True)],
+                                   "UUID": "com.elgato.streamdeck.system.hotkey"}
+        else:
+            wid, mode = target
+            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Bouton QLC+",
+                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.0.0.0"},
+                                   "Settings": {"widgetId": wid, "mode": mode}, "State": 0,
+                                   "States": [st(f"Images/k{c}{r}.png", False), st(f"Images/k{c}{r}on.png", True)],
+                                   "UUID": PLUGIN + ".button"}
     zf.writestr(f"{pdir}/manifest.json", json.dumps(
         {"Controllers": [{"Actions": actions, "Type": "Keypad"}], "Icon": "", "Name": name},
         ensure_ascii=False, indent=1))
