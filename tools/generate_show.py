@@ -430,8 +430,8 @@ def aim(head, target):
 
 
 # Têtes dont le pan tourne à l'envers (montage ou réglage « pan reverse » dans le menu de la tête).
-# Tête 1 : inversé, constaté dans la salle. Si tu enlèves le pan reverse dans son menu, mets False.
-PAN_INVERT = [True, False, False, False]
+# Mettre True pour une tête dont le pan tourne à l'envers.
+PAN_INVERT = [False, False, False, False]
 
 
 def aim_all(targets):
