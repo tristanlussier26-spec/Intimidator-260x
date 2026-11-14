@@ -30,7 +30,7 @@ Profil de fixture QLC+ (`.qxf`) pour la Chauvet Intimidator Spot 260X, modes **1
 Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 
 ## Comment jouer
-1. **Choisis un LOOK** dans la rangée du haut : tout le rig change d'un coup, avec des fondus. Les flèches orange en haut à droite donnent la **page 2**.
+1. **Choisis un LOOK** dans les 3 rangées du haut (30 looks) : tout le rig change d'un coup, avec des fondus.
    Ou appuie sur **▶ AUTO** : les looks s'enchaînent tout seuls aux 16 temps.
 2. **Raffine en live** : une couleur PAR, un gobo, une position ou un mouvement par-dessus le look. Le bouton remplace juste cette partie-là.
 3. **Tape le beat** sur TEMPO : les effets PAR et les mouvements suivent la toune.
@@ -51,7 +51,7 @@ Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 | **PSYCHÉ** | Arc-en-ciel | Arc-en-ciel, gobo 6, prisme, ballyhoo au plafond |
 | **FINAL** | Blanc chaud | Blanc sur le public |
 
-**Page 2**
+**Rangée 2**
 
 | Look | PAR | Têtes |
 |---|---|---|
@@ -65,6 +65,21 @@ Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 | **MONTÉE** | Un par un (tempo) | Jaune, gobo 3 rapide, éventail, vague de tilt |
 | **CHAOS** | Pair/impair (tempo) | Chase couleurs + chase gobos, prisme, ballyhoo |
 | **APOTHÉOSE** | Arc-en-ciel | Blanc + prisme, éventail, ballyhoo |
+
+**Rangée 3**
+
+| Look | PAR | Têtes |
+|---|---|---|
+| **SPOT CHANTEUR** | Bleu nuit | Blanc ouvert, les 4 sur le chanteur |
+| **SOLO BATTERIE** | Pair/impair (tempo) | Rouge, gobo 1 rapide, sur la batterie, cercle |
+| **SOLO BASSE** | Mauve | Magenta, gobo 3 qui tourne, sur la basse |
+| **COUCHER SOLEIL** | Orange | Orange, gobo 5 qui tourne, éventail, balayage lent |
+| **NÉON** | Magenta / cyan | Cyan, gobo 7, prisme, plafond, cercle |
+| **TEMPÊTE** | Strobe aléatoire | Blanc, gobo 6 rapide, croisées, huit |
+| **ROUGE & UV** | Rouge / UV | Rouge, gobo 2 qui tourne, public, vague tilt |
+| **BLEU GLACE** | Cyan | Bleu, gobo 2, V inversé, balayage lent |
+| **FEU D'ARTIFICE** | Arc-en-ciel | Chase couleurs + gobos, prisme, ballyhoo |
+| **ENTRACTE** | Bleu nuit | Bleu, gobo 5 lent au plafond, balayage lent |
 
 ## La Virtual Console
 
@@ -81,6 +96,179 @@ Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 | **Têtes — Mouvement** | Cercle, huit, balayage lent, vague tilt, diamant, ballyhoo. Ils sont **relatifs** : ils bougent autour de la position active, alors garde toujours une position allumée. |
 
 Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces scènes ouvrent le shutter.
+
+## Stream Deck
+
+Chaque bouton du board a un raccourci clavier. Sur le Stream Deck : glisse l'action **Système → Raccourci (Hotkey)** sur une touche et tape la combinaison du tableau.
+
+- QLC+ doit être **en avant-plan** et en **mode show (▶)** : le raccourci va à la fenêtre active.
+- Astuce : mets le nom du look et sa couleur comme titre/fond de la touche Stream Deck.
+- Les flashs (strobe, blinder, bumps) marchent tant que la touche est tenue.
+
+
+**LOOKS DU SHOW — un bouton = tout le rig  **
+
+| Bouton | Touche |
+|---|---|
+| INTRO | `F1` |
+| COUPLET | `F2` |
+| PRÉ-REFRAIN | `F3` |
+| REFRAIN | `F4` |
+| GROS REFRAIN | `F5` |
+| BALLADE | `F6` |
+| SOLO GUITARE | `F7` |
+| ÉNERGIE | `F8` |
+| PSYCHÉ | `F9` |
+| FINAL | `F10` |
+| OUVERTURE | `Shift+F1` |
+| FEU | `Shift+F2` |
+| OCÉAN | `Shift+F3` |
+| DISCO | `Shift+F4` |
+| SOMBRE | `Shift+F5` |
+| ROCK BLANC | `Shift+F6` |
+| ACOUSTIQUE | `Shift+F7` |
+| MONTÉE | `Shift+F8` |
+| CHAOS | `Shift+F9` |
+| APOTHÉOSE | `Shift+F10` |
+| SPOT CHANTEUR | `Ctrl+F1` |
+| SOLO BATTERIE | `Ctrl+F2` |
+| SOLO BASSE | `Ctrl+F3` |
+| COUCHER SOLEIL | `Ctrl+F4` |
+| NÉON | `Ctrl+F5` |
+| TEMPÊTE | `Ctrl+F6` |
+| ROUGE & UV | `Ctrl+F7` |
+| BLEU GLACE | `Ctrl+F8` |
+| FEU D'ARTIFICE | `Ctrl+F9` |
+| ENTRACTE | `Ctrl+F10` |
+| ▶ AUTO | `F11` |
+
+**PAR — COULEURS**
+
+| Bouton | Touche |
+|---|---|
+| Rouge | `Alt+A` |
+| Rouge sang | `Alt+B` |
+| Orange | `Alt+C` |
+| Ambre | `Alt+D` |
+| Or | `Alt+E` |
+| Blanc chaud | `Alt+F` |
+| Blanc froid | `Alt+G` |
+| Cyan | `Alt+H` |
+| Bleu | `Alt+I` |
+| Bleu nuit | `Alt+J` |
+| Mauve | `Alt+K` |
+| Magenta | `Alt+L` |
+| Vert | `Alt+M` |
+| UV | `Alt+N` |
+| Rouge / Ambre | `Alt+O` |
+| Bleu / Ambre | `Alt+P` |
+| Rouge / Bleu | `Alt+Q` |
+| Magenta / Cyan | `Alt+R` |
+| Bords bleus | `Alt+S` |
+| Bords rouges | `Alt+T` |
+
+**PAR — EFFETS**
+
+| Bouton | Touche |
+|---|---|
+| Vague rouge | `Alt+Shift+A` |
+| Vague bleue | `Alt+Shift+B` |
+| Pair / Impair | `Alt+Shift+C` |
+| Alterné ambre/bleu | `Alt+Shift+D` |
+| Un par un | `Alt+Shift+E` |
+| Remplir centre | `Alt+Shift+F` |
+| Arc-en-ciel | `Alt+Shift+G` |
+| Plasma lent | `Alt+Shift+H` |
+| Chase couleurs | `Alt+Shift+I` |
+| Fondu lent | `Alt+Shift+J` |
+
+**MASTERS & TEMPO**
+
+| Bouton | Touche |
+|---|---|
+| TAP tempo | `T` |
+| STROBE PAR | `S` |
+| BLINDER | `B` |
+| STROBE TÊTES | `D` |
+| STROBE FOU | `F` |
+| BLACKOUT | `X` |
+| FONDU AU NOIR | `N` |
+
+**TÊTES — COULEUR**
+
+| Bouton | Touche |
+|---|---|
+| Blanc | `Ctrl+Shift+A` |
+| Rouge | `Ctrl+Shift+B` |
+| Orange | `Ctrl+Shift+C` |
+| Jaune | `Ctrl+Shift+D` |
+| Vert | `Ctrl+Shift+E` |
+| Bleu | `Ctrl+Shift+F` |
+| CTO | `Ctrl+Shift+G` |
+| Cyan | `Ctrl+Shift+H` |
+| Magenta | `Ctrl+Shift+I` |
+| Arc-en-ciel | `Ctrl+Shift+J` |
+
+**TÊTES — GOBO**
+
+| Bouton | Touche |
+|---|---|
+| Ouvert | `Ctrl+Shift+K` |
+| Gobo 1 | `Ctrl+Shift+L` |
+| Gobo 2 | `Ctrl+Shift+M` |
+| Gobo 3 | `Ctrl+Shift+N` |
+| Gobo 4 | `Ctrl+Shift+O` |
+| Gobo 5 | `Ctrl+Shift+P` |
+| Gobo 6 | `Ctrl+Shift+Q` |
+| Gobo 7 | `Ctrl+Shift+R` |
+
+**TÊTES — FX**
+
+| Bouton | Touche |
+|---|---|
+| Rotation gobo | `Ctrl+Shift+T` |
+| Rotation rapide | `Ctrl+Shift+U` |
+| Prisme | `Ctrl+Shift+V` |
+| Chase couleurs | `Ctrl+Shift+W` |
+| Chase gobos | `Ctrl+Shift+Y` |
+
+**TÊTES — POSITION**
+
+| Bouton | Touche |
+|---|---|
+| Centre | `Shift+A` |
+| Public | `Shift+B` |
+| Band | `Shift+C` |
+| Chanteur | `Shift+D` |
+| Croisé | `Shift+E` |
+| Éventail | `Shift+F` |
+| V inversé | `Shift+G` |
+| Batterie | `Shift+H` |
+| Guitare | `Shift+I` |
+| Basse | `Shift+J` |
+| Plafond | `Shift+K` |
+
+**TÊTES — MOUVEMENT**
+
+| Bouton | Touche |
+|---|---|
+| Cercle | `Shift+L` |
+| Huit | `Shift+M` |
+| Balayage lent | `Shift+N` |
+| Vague tilt | `Shift+O` |
+| Diamant | `Shift+P` |
+| Ballyhoo | `Shift+Q` |
+
+**FLASH & BUMPS**
+
+| Bouton | Touche |
+|---|---|
+| BUMP GAUCHE | `G` |
+| BUMP DROITE | `H` |
+| FLASH ROUGE | `J` |
+| FLASH BLEU | `K` |
+| FLASH UV | `L` |
+| FLASH TÊTES | `M` |
 
 ## Anti-bug : la scène BASE
 Certains canaux (strobe des PAR, prisme, rotation de gobo, shutter des têtes) gardent leur dernière valeur quand un flash ou un bouton s'arrête. La scène **BASE (toujours active)** démarre toute seule en mode show et fait partie de chaque look : elle remet ces canaux à zéro dès qu'un flash est relâché.
