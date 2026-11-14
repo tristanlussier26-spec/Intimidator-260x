@@ -235,7 +235,7 @@ for pid, name, grid in pages:
         if kind == "level":
             wid, step, cap = target
             actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": False, "Name": "Niveau QLC+ (fader)",
-                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.0.0"},
+                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.1.0"},
                                    "Settings": {"widgetId": wid, "step": str(step), "label": cap}, "State": 0,
                                    "States": [st(f"Images/k{c}{r}.png", step == 0)],
                                    "UUID": PLUGIN + ".level"}
@@ -247,7 +247,7 @@ for pid, name, grid in pages:
         else:
             wid, mode = target
             actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Bouton QLC+",
-                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.0.0"},
+                                   "Plugin": {"Name": "QLC+ Show", "UUID": PLUGIN, "Version": "1.1.1.0"},
                                    "Settings": {"widgetId": wid, "mode": mode}, "State": 0,
                                    "States": [st(f"Images/k{c}{r}.png", False), st(f"Images/k{c}{r}on.png", True)],
                                    "UUID": PLUGIN + ".button"}

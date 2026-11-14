@@ -28,6 +28,13 @@ La commande ([`install.ps1`](install.ps1)) :
 
 Relance la même commande pour mettre à jour après un changement sur le GitHub.
 
+## Corrections têtes (audit)
+- **Mouvements** : le mode « relatif » des EFX ne bouge pas dans QLC+ 4.12 (testé). Chaque mouvement est maintenant un EFX **absolu par tête**, centré sur la position du look. Les boutons de mouvement manuels tournent autour de la position **Centre**. Choisis la position **avant** le mouvement : une position lancée après fige les têtes.
+- **Prisme / rotation** ne sont plus effacés par les chases de couleurs ou de gobos (DISCO, CHAOS).
+- **Rien ne reste coincé**, même après FONDU AU NOIR : rotation, prisme, fonctions des têtes et strobe/programmes des PAR sont forcés en HTP (ils retombent à 0).
+- **Intensité des têtes** : elle vient maintenant des scènes de couleur. Une tête sans couleur est éteinte. Le fader **TÊTES +** (à 0 au départ) sert juste à ajouter de la lumière à la main.
+- **Plugin 1.1.1** : il tolère les messages abîmés de QLC+ et ne recharge plus la page de QLC+ à chaque reconnexion (ça doublait les messages et causait des coupures en cascade).
+
 ## Ouvrir le show
 1. Télécharger le dossier `show/` au complet (le `.qxw` et le `.qxf` ensemble).
 2. Dans QLC+ : **Fichier → Ouvrir** → `Show-Rock.qxw`.

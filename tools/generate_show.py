@@ -84,11 +84,22 @@ iomap = ET.SubElement(engine, "InputOutputMap")
 uni = ET.SubElement(iomap, "Universe", {"Name": "Universe 1", "ID": "0"})
 ET.SubElement(uni, "Output", {"Plugin": "DMX USB", "Line": "0"})
 
-for fid, name, (man, model, mode, nch), addr in fixtures:
+# Canaux forcés en HTP : ils retombent à 0 dès que plus aucune fonction ne les demande
+# (en LTP, QLC+ garde la dernière valeur → prisme / rotation / strobe coincés, testé).
+FORCED_HTP = {
+    HEAD_MODEL: [H_GROT, H_PRISM, H_FUNC, H_MACRO],
+    PAR_MODEL: [P_STROBE, P_PROG, P_SPEED, P_32B],
+    MOS_MODEL: [MOS_STROBE, MOS_MODE, MOS_SPEED],
+    UK_MODEL: [UK_STROBE, UK_FUNC, UK_SPEED],
+}
+for fid, name, model_t, addr in fixtures:
+    man, model, mode, nch = model_t
     fx = ET.SubElement(engine, "Fixture")
     for tag, val in (("Manufacturer", man), ("Model", model), ("Mode", mode), ("ID", fid),
                      ("Name", name), ("Universe", 0), ("Address", addr), ("Channels", nch)):
         ET.SubElement(fx, tag).text = str(val)
+    if model_t in FORCED_HTP:
+        ET.SubElement(fx, "ForcedHTP").text = ",".join(map(str, FORCED_HTP[model_t]))
 
 
 def group(gid, name, members):
@@ -143,9 +154,10 @@ def scene(name, path, values, fade_in=0, fade_out=0):
     return fid
 
 
-def chaser(name, path, steps, hold=500, fade=0):
+def chaser(name, path, steps, hold=500, fade=0, fade_out=None):
     f, fid = new_func("Chaser", name, path)
-    ET.SubElement(f, "Speed", {"FadeIn": str(fade), "FadeOut": str(fade), "Duration": str(hold)})
+    ET.SubElement(f, "Speed", {"FadeIn": str(fade), "FadeOut": str(fade if fade_out is None else fade_out),
+                               "Duration": str(hold)})
     ET.SubElement(f, "Direction").text = "Forward"
     ET.SubElement(f, "RunOrder").text = "Loop"
     ET.SubElement(f, "SpeedModes", {"FadeIn": "Common", "FadeOut": "Common", "Duration": "Common"})
@@ -198,17 +210,18 @@ def matrix(name, script, color1, color2=None, props=None, duration=500, fade=0):
     return fid
 
 
-def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 90, 180, 270)):
-    f, fid = new_func("EFX", name, "Têtes/Mouvements")
-    for n, h in enumerate(HEADS):
-        fx = ET.SubElement(f, "Fixture")
-        ET.SubElement(fx, "ID").text = str(h)
-        ET.SubElement(fx, "Head").text = "0"
-        ET.SubElement(fx, "Mode").text = "0"
-        ET.SubElement(fx, "Direction").text = "Forward"
-        ET.SubElement(fx, "StartOffset").text = str(offsets[n])
+def efx(name, algo, width, height, head, center, start_offset=0, duration=8000, xfreq=2, yfreq=3, path="Têtes/Mouvements"):
+    """EFX ABSOLU pour une seule tête, centré sur center=(pan, tilt).
+    (Le mode relatif de QLC+ ne bouge pas en 4.12 : testé.)"""
+    f, fid = new_func("EFX", name, path)
+    fx = ET.SubElement(f, "Fixture")
+    ET.SubElement(fx, "ID").text = str(head)
+    ET.SubElement(fx, "Head").text = "0"
+    ET.SubElement(fx, "Mode").text = "0"
+    ET.SubElement(fx, "Direction").text = "Forward"
+    ET.SubElement(fx, "StartOffset").text = str(start_offset)
     ET.SubElement(f, "PropagationMode").text = "Parallel"
-    ET.SubElement(f, "Speed", {"FadeIn": "1000", "FadeOut": "1000", "Duration": str(duration)})
+    ET.SubElement(f, "Speed", {"FadeIn": "800", "FadeOut": "0", "Duration": str(duration)})
     ET.SubElement(f, "Direction").text = "Forward"
     ET.SubElement(f, "RunOrder").text = "Loop"
     ET.SubElement(f, "Algorithm").text = algo
@@ -216,10 +229,10 @@ def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 
     ET.SubElement(f, "Height").text = str(height)
     ET.SubElement(f, "Rotation").text = "0"
     ET.SubElement(f, "StartOffset").text = "0"
-    ET.SubElement(f, "IsRelative").text = "1"      # bouge autour de la position active
-    for axis, freq, phase in (("X", xfreq, 90), ("Y", yfreq, 0)):
+    ET.SubElement(f, "IsRelative").text = "0"
+    for axis, freq, phase, off in (("X", xfreq, 90, center[0]), ("Y", yfreq, 0, center[1])):
         a = ET.SubElement(f, "Axis", {"Name": axis})
-        ET.SubElement(a, "Offset").text = "127"
+        ET.SubElement(a, "Offset").text = str(off)
         ET.SubElement(a, "Frequency").text = str(freq)
         ET.SubElement(a, "Phase").text = str(phase)
     return fid
@@ -317,7 +330,7 @@ TEMPO_FX = [FX[k] for k in ("Vague rouge", "Vague bleue", "Pair / Impair", "Alte
 
 # Flash
 _strobe_hb = scene("PAR Strobe blanc (Hotbox)", "PAR/Flash",
-                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in HOTBOX})
+                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in HOTBOX}, 0, 60)
 # les PAR RGB n'ont pas de canal strobe : on clignote blanc / noir
 _rgb_on = scene("PAR RGB blanc", "PAR/Flash", full(RGB_PARS, {P_R: 255, P_G: 255, P_B: 255, P_W: 255}))
 _rgb_off = scene("PAR RGB noir", "PAR/Flash", full(RGB_PARS, {P_R: 0, P_G: 0, P_B: 0, P_W: 0}))
@@ -345,29 +358,39 @@ HEAD_COLORS = [("Blanc", 3, 0xF0F0F0), ("Rouge", 10, 0xD01010), ("Orange", 17, 0
                ("Jaune", 24, 0xF0E010), ("Vert", 31, 0x10B030), ("Bleu", 38, 0x1030E0),
                ("CTO", 45, 0xFFC080), ("Cyan", 52, 0x20E0E0), ("Magenta", 59, 0xE020C0),
                ("Arc-en-ciel", 205, 0x707070)]
+# Court fondu de sortie sur tout ce qui touche des canaux « LTP » (couleur, gobo, prisme, rotation,
+# shutter/strobe) : à l'arrêt, ils retombent à 0 au lieu de rester coincés — même si BASE a été
+# arrêtée par FONDU AU NOIR. (Testé dans QLC+ : sans fondu de sortie, la valeur reste.)
+LTP_OFF = 60
 head_color = {}
+HEAD_COLOR_VAL = {n: v for n, v, _ in HEAD_COLORS}
 for name, val, _ in HEAD_COLORS:
     head_color[name] = scene(f"Têtes {name}", "Têtes/Couleurs",
-                             {h: {H_COLOR: val, H_STROBE: H_SHUTTER_OPEN, H_PRISM: 0, H_FUNC: 0, H_MACRO: 0}
-                              for h in HEADS})
+                             {h: {H_DIM: 255, H_COLOR: val, H_STROBE: H_SHUTTER_OPEN} for h in HEADS},
+                             0, LTP_OFF)
 
 GOBOS = [("Ouvert", 3)] + [(f"Gobo {i}", 3 + 8 * i) for i in range(1, 8)]
 gobo = {}
 for name, val in GOBOS:
     gobo[name] = scene(f"Têtes {name}", "Têtes/Gobos",
-                       {h: {H_GOBO: val, H_GROT: 0, H_PRISM: 0, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN}
-                        for h in HEADS})
-gobo_rot = scene("Têtes Rotation gobo", "Têtes/FX", {h: {H_GROT: 40} for h in HEADS})
-gobo_rot_fast = scene("Têtes Rotation rapide", "Têtes/FX", {h: {H_GROT: 100} for h in HEADS})
-head_chase_col = chaser("Têtes Chase couleurs", "Têtes/FX",
-                        [head_color[c] for c in ("Rouge", "Bleu", "Vert", "Magenta", "Jaune", "Cyan")])
-head_chase_gobo = chaser("Têtes Chase gobos", "Têtes/FX", [gobo[f"Gobo {i}"] for i in range(1, 8)])
+                       {h: {H_GOBO: val, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN} for h in HEADS}, 0, LTP_OFF)
+gobo_rot = scene("Têtes Rotation gobo", "Têtes/FX", {h: {H_GROT: 40} for h in HEADS}, 0, LTP_OFF)
+gobo_rot_fast = scene("Têtes Rotation rapide", "Têtes/FX", {h: {H_GROT: 100} for h in HEADS}, 0, LTP_OFF)
+# pas des chases : seulement la roue (+ shutter ouvert), pour ne PAS effacer prisme / rotation du look
+_chase_col = [scene(f"Têtes chase {c}", "Têtes/FX/Chase",
+                    {h: {H_DIM: 255, H_COLOR: HEAD_COLOR_VAL[c], H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
+              for c in ("Rouge", "Bleu", "Vert", "Magenta", "Jaune", "Cyan")]
+_chase_gobo = [scene(f"Têtes chase Gobo {i}", "Têtes/FX/Chase",
+                     {h: {H_GOBO: 3 + 8 * i, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
+               for i in range(1, 8)]
+head_chase_col = chaser("Têtes Chase couleurs", "Têtes/FX", _chase_col, fade_out=LTP_OFF)
+head_chase_gobo = chaser("Têtes Chase gobos", "Têtes/FX", _chase_gobo, fade_out=LTP_OFF)
 TEMPO_FX += [head_chase_col, head_chase_gobo]
 flash_heads = scene("Têtes Flash blanc", "Têtes/FX",
-                    {h: {H_DIM: 255, H_COLOR: 3, H_GOBO: 3, H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
-prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
+                    {h: {H_DIM: 255, H_COLOR: 3, H_GOBO: 3, H_STROBE: H_SHUTTER_OPEN} for h in HEADS}, 0, LTP_OFF)
+prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS}, 0, LTP_OFF)
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
-                     {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
+                     {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS}, 0, LTP_OFF)
 
 # Positions calculées à partir du plan de la salle (vu du plafond, 1 carré = 2 pi).
 # Coordonnées en pixels de la capture du plan : x vers la droite (côté guitare), y vers le fond de la salle.
@@ -434,81 +457,97 @@ for name, pts in POSITIONS:
                       {h: {H_PAN: p, H_PANF: 0, H_TILT: t, H_TILTF: 0, H_SPEED: 0}
                        for h, (p, t) in zip(HEADS, pts)}, POS_FADE)
 
-MOVES = {
-    "Cercle": efx("Têtes Cercle", "Circle", 22, 30),
-    "Huit": efx("Têtes Huit", "Eight", 28, 30),
-    "Balayage lent": efx("Têtes Balayage lent", "Line", 32, 6, duration=12000, xfreq=1, yfreq=1,
-                         offsets=(0, 0, 180, 180)),
-    "Vague tilt": efx("Têtes Vague tilt", "Line", 4, 40, duration=6000, xfreq=1, yfreq=1),
-    "Diamant": efx("Têtes Diamant", "Diamond", 22, 30),
-    "Ballyhoo": efx("Têtes Ballyhoo", "Lissajous", 40, 45, duration=10000),
+MOVE_SPECS = {   # algo, largeur, hauteur, options, décalage de phase par tête
+    "Cercle": ("Circle", 22, 30, {}, (0, 90, 180, 270)),
+    "Huit": ("Eight", 28, 30, {}, (0, 90, 180, 270)),
+    "Balayage lent": ("Line", 32, 6, {"duration": 12000, "xfreq": 1, "yfreq": 1}, (0, 0, 180, 180)),
+    "Vague tilt": ("Line", 4, 40, {"duration": 6000, "xfreq": 1, "yfreq": 1}, (0, 90, 180, 270)),
+    "Diamant": ("Diamond", 22, 30, {}, (0, 90, 180, 270)),
+    "Ballyhoo": ("Lissajous", 40, 45, {"duration": 10000}, (0, 90, 180, 270)),
 }
+POS_PTS = dict(POSITIONS)
+_moves = {}
+
+
+def move(mname, pname):
+    """Mouvement mname autour de la position pname : une collection d'EFX absolus (1 par tête)."""
+    if (mname, pname) not in _moves:
+        algo, w, h, opt, offs = MOVE_SPECS[mname]
+        ids = [efx(f"Têtes {mname} @ {pname} (T{i + 1})", algo, w, h, hd, POS_PTS[pname][i], offs[i],
+                   path=f"Têtes/Mouvements/{pname}", **opt)
+               for i, hd in enumerate(HEADS)]
+        _moves[(mname, pname)] = collection(f"Têtes {mname} @ {pname}", "Têtes/Mouvements", ids)
+    return _moves[(mname, pname)]
+
+
+# boutons manuels : autour de la position « Centre »
+MOVES = {n: move(n, "Centre") for n in MOVE_SPECS}
 
 # ================================================================ Looks (tout le rig)
 LOOKS = [  # nom, couleur bouton, [fonctions]
     ("INTRO", 0x101870, [par_color_ids["Bleu nuit"], head_color["Bleu"], gobo["Gobo 2"], gobo_rot,
-                         pos["Public"], MOVES["Balayage lent"]]),
+                         pos["Public"], move("Balayage lent", "Public")]),
     ("COUPLET", 0xFF9A10, [par_color_ids["Ambre"], head_color["CTO"], gobo["Ouvert"], pos["Band"]]),
     ("PRÉ-REFRAIN", 0x9070C0, [FX["Alterné ambre/bleu"], head_color["Magenta"], gobo["Gobo 3"],
-                               pos["Éventail"], MOVES["Vague tilt"]]),
+                               pos["Éventail"], move("Vague tilt", "Éventail")]),
     ("REFRAIN", 0xD01010, [par_color_ids["Rouge"], head_color["Blanc"], gobo["Gobo 1"],
-                           pos["Croisé"], MOVES["Huit"]]),
+                           pos["Croisé"], move("Huit", "Croisé")]),
     ("GROS REFRAIN", 0xFF2020, [FX["Pair / Impair"], head_color["Blanc"], gobo["Ouvert"], prism,
-                                pos["Éventail"], MOVES["Ballyhoo"]]),
+                                pos["Éventail"], move("Ballyhoo", "Éventail")]),
     ("BALLADE", 0x7A30E0, [FX["Plasma lent"], head_color["Magenta"], gobo["Gobo 5"], gobo_rot,
                            pos["Chanteur"]]),
     ("SOLO GUITARE", 0xFFB800, [par_color_ids["Rouge sang"], head_color["Blanc"], gobo["Ouvert"],
                                 pos["Centre"]]),
     ("ÉNERGIE", 0xFF4000, [FX["Vague rouge"], head_color["Rouge"], gobo["Gobo 4"], gobo_rot_fast,
-                           pos["V inversé"], MOVES["Cercle"]]),
+                           pos["V inversé"], move("Cercle", "V inversé")]),
     ("PSYCHÉ", 0x20C0A0, [FX["Arc-en-ciel"], head_color["Arc-en-ciel"], gobo["Gobo 6"], gobo_rot,
-                          prism, pos["Plafond"], MOVES["Ballyhoo"]]),
+                          prism, pos["Plafond"], move("Ballyhoo", "Plafond")]),
     ("FINAL", 0xFFF0D0, [par_color_ids["Blanc chaud"], head_color["Blanc"], gobo["Ouvert"],
                          pos["Public"]]),
 ]
 SPLIT_IDS = {n: i for n, i, _ in SPLITS}
 LOOKS2 = [
     ("OUVERTURE", 0xE0F0FF, [par_color_ids["Blanc froid"], head_color["Blanc"], gobo["Ouvert"],
-                             pos["Public"], MOVES["Balayage lent"]]),
+                             pos["Public"], move("Balayage lent", "Public")]),
     ("FEU", 0xFF5000, [FX["Remplir centre"], head_color["Orange"], gobo["Gobo 4"], gobo_rot,
-                       pos["Band"], MOVES["Vague tilt"]]),
+                       pos["Band"], move("Vague tilt", "Band")]),
     ("OCÉAN", 0x0080C0, [FX["Vague bleue"], head_color["Cyan"], gobo["Gobo 2"], gobo_rot,
-                         pos["Public"], MOVES["Balayage lent"]]),
+                         pos["Public"], move("Balayage lent", "Public")]),
     ("DISCO", 0xE020C0, [FX["Chase couleurs"], head_chase_col, gobo["Gobo 7"], prism,
-                         pos["Plafond"], MOVES["Cercle"]]),
+                         pos["Plafond"], move("Cercle", "Plafond")]),
     ("SOMBRE", 0x400A90, [par_color_ids["UV"], head_color["Bleu"], gobo["Gobo 5"], prism,
-                          pos["Band"], MOVES["Balayage lent"]]),
+                          pos["Band"], move("Balayage lent", "Band")]),
     ("ROCK BLANC", 0xC8D8F0, [par_color_ids["Blanc froid"], head_color["Blanc"], gobo["Gobo 1"],
-                              pos["Croisé"], MOVES["Huit"]]),
+                              pos["Croisé"], move("Huit", "Croisé")]),
     ("ACOUSTIQUE", 0xFFDDB0, [SPLIT_IDS["Bords bleus"], head_color["CTO"], gobo["Ouvert"],
                               pos["Chanteur"]]),
     ("MONTÉE", 0xFFB800, [FX["Un par un"], head_color["Jaune"], gobo["Gobo 3"], gobo_rot_fast,
-                          pos["Éventail"], MOVES["Vague tilt"]]),
+                          pos["Éventail"], move("Vague tilt", "Éventail")]),
     ("CHAOS", 0xB01010, [FX["Pair / Impair"], head_chase_col, head_chase_gobo, prism,
-                         pos["V inversé"], MOVES["Ballyhoo"]]),
+                         pos["V inversé"], move("Ballyhoo", "V inversé")]),
     ("APOTHÉOSE", 0xFFF0D0, [FX["Arc-en-ciel"], head_color["Blanc"], gobo["Ouvert"], prism,
-                             pos["Éventail"], MOVES["Ballyhoo"]]),
+                             pos["Éventail"], move("Ballyhoo", "Éventail")]),
 ]
 LOOKS3 = [
     ("SPOT CHANTEUR", 0xF0F0F0, [par_color_ids["Bleu nuit"], head_color["Blanc"], gobo["Ouvert"], pos["Chanteur"]]),
     ("SOLO BATTERIE", 0xB01010, [FX["Pair / Impair"], head_color["Rouge"], gobo["Gobo 1"], gobo_rot_fast,
-                                 pos["Batterie"], MOVES["Cercle"]]),
+                                 pos["Batterie"], move("Cercle", "Batterie")]),
     ("SOLO BASSE", 0x7A30E0, [par_color_ids["Mauve"], head_color["Magenta"], gobo["Gobo 3"], gobo_rot,
                               pos["Basse"]]),
     ("COUCHER SOLEIL", 0xFF6A00, [par_color_ids["Orange"], head_color["Orange"], gobo["Gobo 5"], gobo_rot,
-                                  pos["Éventail"], MOVES["Balayage lent"]]),
+                                  pos["Éventail"], move("Balayage lent", "Éventail")]),
     ("NÉON", 0x20E0E0, [SPLIT_IDS["Magenta / Cyan"], head_color["Cyan"], gobo["Gobo 7"], prism,
-                        pos["Plafond"], MOVES["Cercle"]]),
+                        pos["Plafond"], move("Cercle", "Plafond")]),
     ("TEMPÊTE", 0xA0A0FF, [strobe_rand, head_color["Blanc"], gobo["Gobo 6"], gobo_rot_fast,
-                           pos["Croisé"], MOVES["Huit"]]),
+                           pos["Croisé"], move("Huit", "Croisé")]),
     ("ROUGE & UV", 0x900060, [red_uv, head_color["Rouge"], gobo["Gobo 2"], gobo_rot, pos["Public"],
-                              MOVES["Vague tilt"]]),
+                              move("Vague tilt", "Public")]),
     ("BLEU GLACE", 0x80D0FF, [par_color_ids["Cyan"], head_color["Bleu"], gobo["Gobo 2"], pos["V inversé"],
-                              MOVES["Balayage lent"]]),
+                              move("Balayage lent", "V inversé")]),
     ("FEU D'ARTIFICE", 0xFF20A0, [FX["Arc-en-ciel"], head_chase_col, head_chase_gobo, prism,
-                                  pos["Plafond"], MOVES["Ballyhoo"]]),
+                                  pos["Plafond"], move("Ballyhoo", "Plafond")]),
     ("ENTRACTE", 0x203060, [par_color_ids["Bleu nuit"], head_color["Bleu"], gobo["Gobo 5"], gobo_rot,
-                            pos["Plafond"], MOVES["Balayage lent"]]),
+                            pos["Plafond"], move("Balayage lent", "Plafond")]),
 ]
 look_ids = [(n, bg, collection(f"LOOK {n}", "Looks", [base] + m)) for n, bg, m in LOOKS]
 look2_ids = [(n, bg, collection(f"LOOK {n}", "Looks", [base] + m)) for n, bg, m in LOOKS2]
@@ -633,7 +672,7 @@ grid(f, [(n, fid, 0x3A3A3A) for n, fid in FX.items()], cols=5, w=122, h=60, keys
 # --- Masters / tempo / flash
 f = frame(root, "MASTERS & TEMPO", 10, 708, 670, 270)
 level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX] + [(u, UK_DIM) for u in UKS] + [(m, MOS_DIM) for m in MOSS], 15, 35, h=225)
-level_slider(f, "TÊTES", [(h, H_DIM) for h in HEADS], 115, 35, h=225)
+level_slider(f, "TÊTES +", [(h, H_DIM) for h in HEADS], 115, 35, h=225, value=0)   # ajout manuel
 sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO — tape le beat", "ID": wid()})
 winstate(sd, 220, 35, 230, 225)
 appearance(sd, font=BOLD)

@@ -24,6 +24,7 @@ let host = '127.0.0.1:9999';
 let qlc = null;
 let qlcOk = false;
 let retry = null;
+let pageLoaded = false;           // la page web de QLC+ (qui branche le retour d'état) déjà chargée ?
 
 // ------------------------------------------------------------------ Stream Deck
 const sd = new WebSocket(`ws://127.0.0.1:${args.port}`);
@@ -158,30 +159,40 @@ function qlcSend(s) { if (qlcOk) qlc.send(s); }
 
 function connectQlc() {
   clearTimeout(retry);
-  const ws = new WebSocket(`ws://${host}/qlcplusWS`, { handshakeTimeout: 3000 });
+  // QLC+ envoie parfois des trames mal encodées quand plusieurs choses changent en même temps :
+  // on ne valide pas l'UTF-8 (sinon la connexion coupe à chaque fois).
+  const ws = new WebSocket(`ws://${host}/qlcplusWS`, { handshakeTimeout: 3000, skipUTF8Validation: true });
+  let opened = false;
   qlc = ws;
   ws.on('open', () => {
     if (ws !== qlc) return;
+    opened = true;
     qlcOk = true;
     log(`connecté à ${host}`);
     qlcSend('QLC+API|getWidgetsList');
-    // QLC+ ne branche le retour d'état des boutons qu'une fois sa page web générée : on la charge.
-    http.get(`http://${host}/`, (res) => { res.resume(); res.on('end', () => {
-      for (const ctx of contexts.keys()) refresh(ctx);
-    }); }).on('error', () => {});
+    // QLC+ ne branche le retour d'état des boutons qu'une fois sa page web générée : on la charge,
+    // UNE seule fois par démarrage de QLC+ (chaque chargement double les messages de retour).
+    if (!pageLoaded) {
+      pageLoaded = true;
+      http.get(`http://${host}/`, (res) => { res.resume(); res.on('end', () => {
+        for (const ctx of contexts.keys()) refresh(ctx);
+      }); }).on('error', () => { pageLoaded = false; });
+    }
     for (const ctx of contexts.keys()) refresh(ctx);
   });
   ws.on('message', (data) => {
     if (ws !== qlc) return;
-    onQlc(data.toString());
+    onQlc(Buffer.from(data).toString('latin1'));
   });
   const down = () => {
     if (ws !== qlc) return;
     if (qlcOk) log('déconnecté — nouvel essai…');
     qlcOk = false;
-    status.clear();
-    for (const ctx of contexts.keys()) setKeyState(ctx);
-    retry = setTimeout(connectQlc, 2000);
+    // jamais connecté = QLC+ fermé ou relancé : il faudra recharger sa page au retour
+    if (!opened) pageLoaded = false;
+    // coupure sur une trame abîmée (QLC+ toujours là) : on revient tout de suite, sans éteindre les touches
+    retry = setTimeout(connectQlc, opened ? 300 : 2000);
+    if (!opened) { status.clear(); for (const ctx of contexts.keys()) setKeyState(ctx); }
   };
   ws.on('close', down);
   ws.on('error', () => { try { ws.terminate(); } catch {} });

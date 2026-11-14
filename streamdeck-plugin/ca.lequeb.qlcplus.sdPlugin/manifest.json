@@ -1,6 +1,6 @@
 {
   "Name": "QLC+ Show",
-  "Version": "1.1.0.0",
+  "Version": "1.1.1.0",
   "Author": "LeQueb",
   "Description": "Contrôle les boutons du Virtual Console de QLC+ par l'accès web : pas besoin que QLC+ soit en avant-plan, les touches s'allument quand le bouton est actif.",
   "UUID": "ca.lequeb.qlcplus",
