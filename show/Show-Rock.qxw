@@ -173,24 +173,24 @@
    <Channels>3</Channels>
   </Fixture>
   <Fixture>
-   <Manufacturer>Generic</Manufacturer>
-   <Model>Generic RGBW</Model>
-   <Mode>RGBW</Mode>
+   <Manufacturer>UKing</Manufacturer>
+   <Model>ZQ01061 RGBW Par</Model>
+   <Mode>8 Channel</Mode>
    <ID>16</ID>
    <Name>U1 face</Name>
    <Universe>0</Universe>
    <Address>133</Address>
-   <Channels>4</Channels>
+   <Channels>8</Channels>
   </Fixture>
   <Fixture>
-   <Manufacturer>Generic</Manufacturer>
-   <Model>Generic RGBW</Model>
-   <Mode>RGBW</Mode>
+   <Manufacturer>UKing</Manufacturer>
+   <Model>ZQ01061 RGBW Par</Model>
+   <Mode>8 Channel</Mode>
    <ID>17</ID>
    <Name>U2 face</Name>
    <Universe>0</Universe>
-   <Address>137</Address>
-   <Channels>4</Channels>
+   <Address>141</Address>
+   <Channels>8</Channels>
   </Fixture>
   <FixtureGroup ID="0">
    <Name>PAR scène (gauche → droite)</Name>
@@ -226,6 +226,8 @@
    <FixtureVal ID="5">7,0,8,0,9,0,10,0</FixtureVal>
    <FixtureVal ID="6">7,0,8,0,9,0,10,0</FixtureVal>
    <FixtureVal ID="7">7,0,8,0,9,0,10,0</FixtureVal>
+   <FixtureVal ID="16">5,0,6,0,7,0</FixtureVal>
+   <FixtureVal ID="17">5,0,6,0,7,0</FixtureVal>
   </Function>
   <Function ID="1" Type="Scene" Name="PAR Rouge" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -239,8 +241,8 @@
    <FixtureVal ID="11">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,0,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="2" Type="Scene" Name="PAR Rouge sang" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -254,8 +256,8 @@
    <FixtureVal ID="11">0,255,1,27,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,27,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,27,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,27,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,27,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,27,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,27,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="3" Type="Scene" Name="PAR Orange" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -269,8 +271,8 @@
    <FixtureVal ID="11">0,255,1,155,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,155,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,155,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,155,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,155,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,155,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,155,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="4" Type="Scene" Name="PAR Ambre" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -284,8 +286,8 @@
    <FixtureVal ID="11">0,255,1,115,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,115,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,115,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,115,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,115,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,115,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,115,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="5" Type="Scene" Name="PAR Or" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -299,8 +301,8 @@
    <FixtureVal ID="11">0,255,1,180,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,180,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,180,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,180,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,180,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,180,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,180,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="6" Type="Scene" Name="PAR Blanc chaud" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -314,8 +316,8 @@
    <FixtureVal ID="11">0,255,1,255,2,178</FixtureVal>
    <FixtureVal ID="12">0,255,1,255,2,178</FixtureVal>
    <FixtureVal ID="13">0,255,1,255,2,178</FixtureVal>
-   <FixtureVal ID="16">0,160,1,72,2,0,3,255</FixtureVal>
-   <FixtureVal ID="17">0,160,1,72,2,0,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,160,2,72,3,0,4,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,160,2,72,3,0,4,255</FixtureVal>
   </Function>
   <Function ID="7" Type="Scene" Name="PAR Blanc froid" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -329,8 +331,8 @@
    <FixtureVal ID="11">0,230,1,244,2,255</FixtureVal>
    <FixtureVal ID="12">0,230,1,244,2,255</FixtureVal>
    <FixtureVal ID="13">0,230,1,244,2,255</FixtureVal>
-   <FixtureVal ID="16">0,0,1,40,2,120,3,255</FixtureVal>
-   <FixtureVal ID="17">0,0,1,40,2,120,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,40,3,120,4,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,40,3,120,4,255</FixtureVal>
   </Function>
   <Function ID="8" Type="Scene" Name="PAR Cyan" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -344,8 +346,8 @@
    <FixtureVal ID="11">0,0,1,255,2,255</FixtureVal>
    <FixtureVal ID="12">0,0,1,255,2,255</FixtureVal>
    <FixtureVal ID="13">0,0,1,255,2,255</FixtureVal>
-   <FixtureVal ID="16">0,0,1,255,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,0,1,255,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,255,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,255,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="9" Type="Scene" Name="PAR Bleu" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -359,8 +361,8 @@
    <FixtureVal ID="11">0,0,1,0,2,255</FixtureVal>
    <FixtureVal ID="12">0,0,1,0,2,255</FixtureVal>
    <FixtureVal ID="13">0,0,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,0,1,0,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,0,1,0,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,0,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,0,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="10" Type="Scene" Name="PAR Bleu nuit" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -374,8 +376,8 @@
    <FixtureVal ID="11">0,60,1,0,2,255</FixtureVal>
    <FixtureVal ID="12">0,60,1,0,2,255</FixtureVal>
    <FixtureVal ID="13">0,60,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,60,1,0,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,60,1,0,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,60,2,0,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,60,2,0,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="11" Type="Scene" Name="PAR Mauve" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -389,8 +391,8 @@
    <FixtureVal ID="11">0,168,1,0,2,255</FixtureVal>
    <FixtureVal ID="12">0,168,1,0,2,255</FixtureVal>
    <FixtureVal ID="13">0,168,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,168,1,0,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,168,1,0,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,168,2,0,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,168,2,0,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="12" Type="Scene" Name="PAR Magenta" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -404,8 +406,8 @@
    <FixtureVal ID="11">0,255,1,0,2,200</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,200</FixtureVal>
    <FixtureVal ID="13">0,255,1,0,2,200</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,200,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,200,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,200,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,200,4,0</FixtureVal>
   </Function>
   <Function ID="13" Type="Scene" Name="PAR Vert" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -419,8 +421,8 @@
    <FixtureVal ID="11">0,0,1,255,2,0</FixtureVal>
    <FixtureVal ID="12">0,0,1,255,2,0</FixtureVal>
    <FixtureVal ID="13">0,0,1,255,2,0</FixtureVal>
-   <FixtureVal ID="16">0,0,1,255,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,0,1,255,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,255,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,255,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="14" Type="Scene" Name="PAR UV" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -434,8 +436,8 @@
    <FixtureVal ID="11">0,76,1,0,2,153</FixtureVal>
    <FixtureVal ID="12">0,76,1,0,2,153</FixtureVal>
    <FixtureVal ID="13">0,76,1,0,2,153</FixtureVal>
-   <FixtureVal ID="16">0,76,1,0,2,153,3,0</FixtureVal>
-   <FixtureVal ID="17">0,76,1,0,2,153,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,76,2,0,3,153,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,76,2,0,3,153,4,0</FixtureVal>
   </Function>
   <Function ID="15" Type="Scene" Name="PAR Rouge / Ambre" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -449,8 +451,8 @@
    <FixtureVal ID="11">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,115,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="16" Type="Scene" Name="PAR Bleu / Ambre" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -464,8 +466,8 @@
    <FixtureVal ID="11">0,0,1,0,2,255</FixtureVal>
    <FixtureVal ID="12">0,0,1,0,2,255</FixtureVal>
    <FixtureVal ID="13">0,255,1,115,2,0</FixtureVal>
-   <FixtureVal ID="16">0,0,1,0,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,0,1,0,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,0,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,0,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="17" Type="Scene" Name="PAR Rouge / Bleu" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -479,8 +481,8 @@
    <FixtureVal ID="11">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="13">0,0,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="18" Type="Scene" Name="PAR Magenta / Cyan" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -494,8 +496,8 @@
    <FixtureVal ID="11">0,255,1,0,2,200</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,200</FixtureVal>
    <FixtureVal ID="13">0,0,1,255,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,200,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,200,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,200,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,200,4,0</FixtureVal>
   </Function>
   <Function ID="19" Type="Scene" Name="PAR Bords bleus" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -509,8 +511,8 @@
    <FixtureVal ID="11">0,60,1,0,2,255</FixtureVal>
    <FixtureVal ID="12">0,60,1,0,2,255</FixtureVal>
    <FixtureVal ID="13">0,60,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,115,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,115,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,115,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,115,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="20" Type="Scene" Name="PAR Bords rouges" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -524,8 +526,8 @@
    <FixtureVal ID="11">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="13">0,255,1,0,2,0</FixtureVal>
-   <FixtureVal ID="16">0,160,1,72,2,0,3,255</FixtureVal>
-   <FixtureVal ID="17">0,160,1,72,2,0,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,160,2,72,3,0,4,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,160,2,72,3,0,4,255</FixtureVal>
   </Function>
   <Function ID="21" Type="Scene" Name="PAR Rouge / UV" Path="PAR/Couleurs">
    <Speed FadeIn="400" FadeOut="400" Duration="0" />
@@ -539,8 +541,8 @@
    <FixtureVal ID="11">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="12">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="13">0,76,1,0,2,153</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="22" Type="RGBMatrix" Name="PAR Vague rouge" Path="PAR/Effets">
    <Speed FadeIn="0" FadeOut="0" Duration="500" />
@@ -663,8 +665,8 @@
    <FixtureVal ID="13">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="14">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="15">0,255,1,255,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,255,2,255,3,255</FixtureVal>
-   <FixtureVal ID="17">0,255,1,255,2,255,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,255,3,255,4,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,255,3,255,4,255</FixtureVal>
   </Function>
   <Function ID="34" Type="Scene" Name="PAR RGB noir" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -676,8 +678,8 @@
    <FixtureVal ID="13">0,0,1,0,2,0</FixtureVal>
    <FixtureVal ID="14">0,0,1,0,2,0</FixtureVal>
    <FixtureVal ID="15">0,0,1,0,2,0</FixtureVal>
-   <FixtureVal ID="16">0,0,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,0,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,0,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,0,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="35" Type="Chaser" Name="PAR RGB strobe" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="45" />
@@ -705,8 +707,8 @@
    <FixtureVal ID="13">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="14">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="15">0,255,1,255,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,255,2,255,3,255</FixtureVal>
-   <FixtureVal ID="17">0,255,1,255,2,255,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,255,3,255,4,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,255,3,255,4,255</FixtureVal>
   </Function>
   <Function ID="38" Type="Scene" Name="PAR Bump gauche" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -717,7 +719,7 @@
    <FixtureVal ID="12">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="14">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="15">0,255,1,255,2,255</FixtureVal>
-   <FixtureVal ID="16">0,255,1,255,2,255,3,255</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,255,3,255,4,255</FixtureVal>
   </Function>
   <Function ID="39" Type="Scene" Name="PAR Bump droite" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -726,7 +728,7 @@
    <FixtureVal ID="10">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="11">0,255,1,255,2,255</FixtureVal>
    <FixtureVal ID="13">0,255,1,255,2,255</FixtureVal>
-   <FixtureVal ID="17">0,255,1,255,2,255,3,255</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,255,3,255,4,255</FixtureVal>
   </Function>
   <Function ID="40" Type="Scene" Name="PAR Flash rouge" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -742,8 +744,8 @@
    <FixtureVal ID="13">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="14">0,255,1,0,2,0</FixtureVal>
    <FixtureVal ID="15">0,255,1,0,2,0</FixtureVal>
-   <FixtureVal ID="16">0,255,1,0,2,0,3,0</FixtureVal>
-   <FixtureVal ID="17">0,255,1,0,2,0,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,255,2,0,3,0,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,255,2,0,3,0,4,0</FixtureVal>
   </Function>
   <Function ID="41" Type="Scene" Name="PAR Flash bleu" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -759,8 +761,8 @@
    <FixtureVal ID="13">0,36,1,0,2,255</FixtureVal>
    <FixtureVal ID="14">0,36,1,0,2,255</FixtureVal>
    <FixtureVal ID="15">0,36,1,0,2,255</FixtureVal>
-   <FixtureVal ID="16">0,36,1,0,2,255,3,0</FixtureVal>
-   <FixtureVal ID="17">0,36,1,0,2,255,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,36,2,0,3,255,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,36,2,0,3,255,4,0</FixtureVal>
   </Function>
   <Function ID="42" Type="Scene" Name="PAR Flash UV" Path="PAR/Flash">
    <Speed FadeIn="0" FadeOut="0" Duration="0" />
@@ -776,8 +778,8 @@
    <FixtureVal ID="13">0,76,1,0,2,153</FixtureVal>
    <FixtureVal ID="14">0,76,1,0,2,153</FixtureVal>
    <FixtureVal ID="15">0,76,1,0,2,153</FixtureVal>
-   <FixtureVal ID="16">0,76,1,0,2,153,3,0</FixtureVal>
-   <FixtureVal ID="17">0,76,1,0,2,153,3,0</FixtureVal>
+   <FixtureVal ID="16">0,255,1,76,2,0,3,153,4,0</FixtureVal>
+   <FixtureVal ID="17">0,255,1,76,2,0,3,153,4,0</FixtureVal>
   </Function>
   <Function ID="43" Type="RGBMatrix" Name="PAR Strobe aléatoire" Path="PAR/Effets">
    <Speed FadeIn="0" FadeOut="0" Duration="40" />
@@ -2573,6 +2575,8 @@
       <Channel Fixture="5">0</Channel>
       <Channel Fixture="6">0</Channel>
       <Channel Fixture="7">0</Channel>
+      <Channel Fixture="16">0</Channel>
+      <Channel Fixture="17">0</Channel>
      </Level>
      <Playback>
       <Function>4294967295</Function>

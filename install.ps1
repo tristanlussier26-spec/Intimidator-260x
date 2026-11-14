@@ -3,7 +3,7 @@
 $ErrorActionPreference = "Stop"
 $d = "$HOME\Documents\Show-Rock"
 $u = "https://github.com/tristanlussier26-spec/Intimidator-260x/raw/main/show"
-$files = "Show-Rock.qxw", "Chauvet-Intimidator-Spot-260X.qxf", "Lancer-QLC.bat",
+$files = "Show-Rock.qxw", "Chauvet-Intimidator-Spot-260X.qxf", "UKing-ZQ01061-RGBW-Par.qxf", "Lancer-QLC.bat",
          "QLC-Plus-Show.streamDeckPlugin", "Show-Rock-XL.streamDeckProfile"
 
 New-Item -ItemType Directory -Force $d | Out-Null

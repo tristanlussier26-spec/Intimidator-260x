@@ -21,7 +21,8 @@ PAR_MODEL = ("Blizzard Lighting", "Hotbox EXA", "11 Channel Mode", 11)
 PAR_FIRST, PAR_COUNT = 66, 4
 # PAR ajoutés, en mode « couleurs seulement » (fixtures Generic inclus dans QLC+, rien à installer)
 MOS_MODEL = ("Generic", "Generic RGB", "RGB", 3)      # MOSFiATA PAR-36 (36 LED RGB), mode 3 canaux
-UK_MODEL = ("Generic", "Generic RGBW", "RGBW", 4)     # U`King 18x10W RGBW, mode 4 canaux (d001)
+UK_MODEL = ("UKing", "ZQ01061 RGBW Par", "8 Channel", 8)   # U`King 18x10W RGBW, mode 8 canaux (A001)
+UK_DIM, UK_STROBE, UK_FUNC, UK_SPEED = 0, 5, 6, 7
 # D'après le plan de la salle (x : 0 = gauche de la scène, 1 = droite, vu du public)
 MOS = [  # nom, adresse, x, rôle
     ("M1 contre", 110, 0.10, "back"), ("M2 contre", 113, 0.30, "back"),
@@ -29,7 +30,7 @@ MOS = [  # nom, adresse, x, rôle
     ("M5 face G", 122, 0.00, "front"), ("M6 face D", 125, 1.00, "front"),
     ("M7 public", 128, -0.05, "crowd"), ("M8 public", 131, -0.04, "crowd"),
 ]
-UK = [("U1 face", 134, 0.33, "front"), ("U2 face", 138, 0.63, "front")]
+UK = [("U1 face", 134, 0.33, "front"), ("U2 face", 142, 0.63, "front")]
 POS_HOTBOX = [0.2, 0.4, 0.6, 0.8]
 
 # Canaux (index 0-based dans le mode)
@@ -53,7 +54,8 @@ for model, lst in ((MOS_MODEL, MOS), (UK_MODEL, UK)):
     for name, a, x, role in lst:
         XPOS[len(fixtures)], ROLE[len(fixtures)] = x, role
         fixtures.append((len(fixtures), name, model, a - 1))
-RGB_PARS = {f[0]: f[2][3] for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}   # id -> 3 (RGB) / 4 (RGBW)
+RGB_PARS = {f[0]: (3 if f[2] is MOS_MODEL else 8) for f in fixtures if f[2] in (MOS_MODEL, UK_MODEL)}
+UKS = [f for f, n in RGB_PARS.items() if n == 8]
 PARS = sorted(XPOS, key=lambda f: XPOS[f])          # tous les PAR, de gauche à droite
 CROWD = [p for p in PARS if ROLE.get(p) == "crowd"]  # éclairent le public : seulement dans les flashs
 BACK = [p for p in PARS if ROLE.get(p) == "back"]
@@ -109,8 +111,8 @@ def rgbify(chans, nch):
     if not any(k in chans for k in keys):
         return {}
     r, g, b, a, w, uv = (chans.get(k, 0) for k in keys)
-    if nch == 4:
-        out = [r + a + uv * .3, g + a * .45, b + uv * .6, w]
+    if nch == 8:     # U`King 8 canaux : dimmer, R, G, B, W (+ strobe/fonction gérés par BASE)
+        out = [255, r + a + uv * .3, g + a * .45, b + uv * .6, w]
     else:
         out = [r + a + w * .9 + uv * .3, g + a * .45 + w * .8, b + w * .7 + uv * .6]
     return {i: min(255, int(round(v))) for i, v in enumerate(out)}
@@ -122,7 +124,9 @@ def scene(name, path, values, fade_in=0, fade_out=0):
     ET.SubElement(f, "Speed", {"FadeIn": str(fade_in), "FadeOut": str(fade_out), "Duration": "0"})
     for fx in sorted(values):
         chans = values[fx]
-        if fx in RGB_PARS:
+        if "raw" in chans:                          # canaux bruts, sans conversion
+            chans = chans["raw"]
+        elif fx in RGB_PARS:
             chans = rgbify(chans, RGB_PARS[fx])
             if not chans:
                 continue
@@ -219,7 +223,8 @@ def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 
 # fournit la valeur de repli : strobe PAR fermé, prisme off, rotation off, shutter têtes fermé.
 base = scene("BASE (toujours active)", "Système",
              {**{p: {P_STROBE: 0, P_PROG: 0, P_SPEED: 0, P_32B: 0} for p in HOTBOX},
-              **{h: {H_STROBE: 0, H_PRISM: 0, H_GROT: 0, H_FUNC: 0, H_MACRO: 0} for h in HEADS}})
+              **{h: {H_STROBE: 0, H_PRISM: 0, H_GROT: 0, H_FUNC: 0, H_MACRO: 0} for h in HEADS},
+              **{u: {"raw": {UK_STROBE: 0, UK_FUNC: 0, UK_SPEED: 0}} for u in UKS}})
 engine.set("Autostart", str(base))
 
 # ================================================================ PAR
@@ -611,7 +616,7 @@ grid(f, [(n, fid, 0x3A3A3A) for n, fid in FX.items()], cols=5, w=122, h=60, keys
 
 # --- Masters / tempo / flash
 f = frame(root, "MASTERS & TEMPO", 10, 708, 670, 270)
-level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX], 15, 35, h=225)
+level_slider(f, "PAR", [(p, P_DIM) for p in HOTBOX] + [(u, UK_DIM) for u in UKS], 15, 35, h=225)
 level_slider(f, "TÊTES", [(h, H_DIM) for h in HEADS], 115, 35, h=225)
 sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO — tape le beat", "ID": wid()})
 winstate(sd, 220, 35, 230, 225)
