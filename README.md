@@ -25,7 +25,7 @@ Profil de fixture QLC+ (`.qxf`) pour la Chauvet Intimidator Spot 260X, modes **1
 | Fixture | Profil / mode | Adresses DMX |
 |---|---|---|
 | Têtes 1 à 4 | Chauvet Intimidator Spot 260X — 14 Channel | 1, 15, 29, 43 |
-| PAR 1 à 12 (gauche → droite) | Blizzard Lighting Hotbox EXA — 11 Channel Mode | 66, 77, 88, 99, 110, 121, 132, 143, 154, 165, 176, 187 |
+| PAR 1 à 4 (gauche → droite) | Blizzard Lighting Hotbox EXA — 11 Channel Mode | 66, 77, 88, 99 |
 
 Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 

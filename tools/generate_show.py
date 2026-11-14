@@ -4,7 +4,7 @@ Génère le workspace QLC+ « Show Rock » (show/Show-Rock.qxw).
 
 Patch (Universe 1, adresses DMX 1-based) :
   - Têtes 1-4 : Chauvet Intimidator Spot 260X, mode 14 Channel -> 1, 15, 29, 43
-  - PAR 1-12 (gauche -> droite) : Blizzard Lighting Hotbox EXA, 11 Channel Mode -> 66, 77, ... 187
+  - PAR 1-4 (gauche -> droite) : Blizzard Lighting Hotbox EXA, 11 Channel Mode -> 66, 77, 88, 99
 
 Relancer :  python3 tools/generate_show.py
 Pour changer une adresse ou ajouter un fixture, modifie les constantes plus bas.
@@ -18,7 +18,7 @@ OUT = os.path.join(os.path.dirname(__file__), "..", "show", "Show-Rock.qxw")
 HEAD_MODEL = ("Chauvet", "Intimidator Spot 260X", "14 Channel", 14)
 HEAD_ADDR = [1, 15, 29, 43]
 PAR_MODEL = ("Blizzard Lighting", "Hotbox EXA", "11 Channel Mode", 11)
-PAR_FIRST, PAR_COUNT = 66, 12
+PAR_FIRST, PAR_COUNT = 66, 4
 
 # Canaux (index 0-based dans le mode)
 H_PAN, H_PANF, H_TILT, H_TILTF, H_SPEED, H_COLOR, H_GOBO, H_GROT, H_PRISM, H_FOCUS, \
@@ -192,11 +192,14 @@ def split(name, c1, c2):
                  {p: (a if i % 2 == 0 else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
 
 
+EDGE = max(1, len(PARS) // 4)
+
+
 def sides(name, c_out, c_in):
-    """extérieur / centre : 3 PAR de chaque bord vs les 6 du milieu"""
+    """extérieur / centre : PAR des bords vs ceux du milieu"""
     a, b = dict(zip(CH6, PC[c_out])), dict(zip(CH6, PC[c_in]))
     return scene(f"PAR {name}", "PAR/Couleurs",
-                 {p: (a if i < 3 or i >= 9 else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
+                 {p: (a if i < EDGE or i >= len(PARS) - EDGE else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
 
 
 SPLITS = [
@@ -243,8 +246,9 @@ def full(pars, chans):
 
 
 WHITE = {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255}
-bump_left = scene("PAR Bump gauche", "PAR/Flash", full(PARS[:6], WHITE))
-bump_right = scene("PAR Bump droite", "PAR/Flash", full(PARS[6:], WHITE))
+HALF = len(PARS) // 2
+bump_left = scene("PAR Bump gauche", "PAR/Flash", full(PARS[:HALF], WHITE))
+bump_right = scene("PAR Bump droite", "PAR/Flash", full(PARS[HALF:], WHITE))
 flash_red = scene("PAR Flash rouge", "PAR/Flash", full(PARS, {P_DIM: 255, P_R: 255}))
 flash_blue = scene("PAR Flash bleu", "PAR/Flash", full(PARS, {P_DIM: 255, P_B: 255, P_UV: 120}))
 flash_uv = scene("PAR Flash UV", "PAR/Flash", full(PARS, {P_DIM: 255, P_UV: 255}))
