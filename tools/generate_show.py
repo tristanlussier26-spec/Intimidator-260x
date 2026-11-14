@@ -11,7 +11,6 @@ Pour changer une adresse ou ajouter un fixture, modifie les constantes plus bas.
 """
 import os
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "show", "Show-Rock.qxw")
 
@@ -78,10 +77,10 @@ def new_func(ftype, name, path):
     return f, _fid[0] - 1
 
 
-def scene(name, path, values, fade_in=0):
+def scene(name, path, values, fade_in=0, fade_out=0):
     """values: {fixture_id: {channel: value}}"""
     f, fid = new_func("Scene", name, path)
-    ET.SubElement(f, "Speed", {"FadeIn": str(fade_in), "FadeOut": "0", "Duration": "0"})
+    ET.SubElement(f, "Speed", {"FadeIn": str(fade_in), "FadeOut": str(fade_out), "Duration": "0"})
     for fx in sorted(values):
         chans = values[fx]
         txt = ",".join(f"{c},{v}" for c, v in sorted(chans.items()))
@@ -89,15 +88,22 @@ def scene(name, path, values, fade_in=0):
     return fid
 
 
-def chaser(name, path, steps, hold=500):
+def chaser(name, path, steps, hold=500, fade=0):
     f, fid = new_func("Chaser", name, path)
-    ET.SubElement(f, "Speed", {"FadeIn": "0", "FadeOut": "0", "Duration": str(hold)})
+    ET.SubElement(f, "Speed", {"FadeIn": str(fade), "FadeOut": str(fade), "Duration": str(hold)})
     ET.SubElement(f, "Direction").text = "Forward"
     ET.SubElement(f, "RunOrder").text = "Loop"
-    ET.SubElement(f, "SpeedModes", {"FadeIn": "Default", "FadeOut": "Default", "Duration": "Common"})
+    ET.SubElement(f, "SpeedModes", {"FadeIn": "Common", "FadeOut": "Common", "Duration": "Common"})
     for n, sid in enumerate(steps):
         ET.SubElement(f, "Step", {"Number": str(n), "FadeIn": "0", "Hold": "0",
                                   "FadeOut": "0"}).text = str(sid)
+    return fid
+
+
+def collection(name, path, members):
+    f, fid = new_func("Collection", name, path)
+    for n, sid in enumerate(members):
+        ET.SubElement(f, "Step", {"Number": str(n)}).text = str(sid)
     return fid
 
 
@@ -117,7 +123,7 @@ def matrix(name, script, color1, color2=None, props=None, duration=500, fade=0):
     return fid
 
 
-def efx(name, algo, width, height, duration=4000, xfreq=2, yfreq=3):
+def efx(name, algo, width, height, duration=8000, xfreq=2, yfreq=3, offsets=(0, 90, 180, 270)):
     f, fid = new_func("EFX", name, "Têtes/Mouvements")
     for n, h in enumerate(HEADS):
         fx = ET.SubElement(f, "Fixture")
@@ -125,9 +131,9 @@ def efx(name, algo, width, height, duration=4000, xfreq=2, yfreq=3):
         ET.SubElement(fx, "Head").text = "0"
         ET.SubElement(fx, "Mode").text = "0"
         ET.SubElement(fx, "Direction").text = "Forward"
-        ET.SubElement(fx, "StartOffset").text = str(n * 90)   # décalage en éventail
+        ET.SubElement(fx, "StartOffset").text = str(offsets[n])
     ET.SubElement(f, "PropagationMode").text = "Parallel"
-    ET.SubElement(f, "Speed", {"FadeIn": "0", "FadeOut": "0", "Duration": str(duration)})
+    ET.SubElement(f, "Speed", {"FadeIn": "1000", "FadeOut": "1000", "Duration": str(duration)})
     ET.SubElement(f, "Direction").text = "Forward"
     ET.SubElement(f, "RunOrder").text = "Loop"
     ET.SubElement(f, "Algorithm").text = algo
@@ -144,73 +150,109 @@ def efx(name, algo, width, height, duration=4000, xfreq=2, yfreq=3):
     return fid
 
 
-# ---------------------------------------------------------------- PAR : couleurs
+# ================================================================ PAR
+COLOR_FADE = 400       # ms : fondu entre deux couleurs PAR
+CH6 = (P_R, P_G, P_B, P_A, P_W, P_UV)
+
 PAR_COLORS = [  # nom, (R, G, B, A, W, UV), couleur du bouton
     ("Rouge", (255, 0, 0, 0, 0, 0), 0xD01010),
-    ("Bleu", (0, 0, 255, 0, 0, 0), 0x1030E0),
-    ("Vert", (0, 255, 0, 0, 0, 0), 0x10B030),
+    ("Rouge sang", (255, 0, 0, 60, 0, 0), 0x8A0A0A),
+    ("Orange", (255, 40, 0, 255, 0, 0), 0xFF6A00),
     ("Ambre", (0, 0, 0, 255, 0, 0), 0xFF9A10),
-    ("Blanc", (0, 0, 0, 0, 255, 0), 0xF0F0F0),
-    ("Blanc chaud", (0, 0, 0, 160, 255, 0), 0xFFD9A0),
-    ("Magenta", (255, 0, 200, 0, 0, 0), 0xE020C0),
+    ("Or", (255, 90, 0, 200, 0, 0), 0xFFB800),
+    ("Blanc chaud", (0, 0, 0, 160, 255, 0), 0xFFDDB0),
+    ("Blanc froid", (0, 40, 120, 0, 255, 0), 0xE0F0FF),
     ("Cyan", (0, 255, 255, 0, 0, 0), 0x20E0E0),
-    ("Or", (255, 90, 0, 200, 0, 0), 0xFFB000),
-    ("Mauve", (120, 0, 255, 0, 0, 160), 0x8030E0),
-    ("UV", (0, 0, 0, 0, 0, 255), 0x5010A0),
+    ("Bleu", (0, 0, 255, 0, 0, 0), 0x1030E0),
+    ("Bleu nuit", (0, 0, 255, 0, 0, 200), 0x101870),
+    ("Mauve", (120, 0, 255, 0, 0, 160), 0x7A30E0),
+    ("Magenta", (255, 0, 200, 0, 0, 0), 0xE020C0),
+    ("Vert", (0, 255, 0, 0, 0, 0), 0x10B030),
+    ("UV", (0, 0, 0, 0, 0, 255), 0x400A90),
 ]
+PC = {n: c for n, c, _ in PAR_COLORS}
 par_color_ids = {}
-for name, rgbawu, _ in PAR_COLORS:
-    vals = {p: dict(zip((P_R, P_G, P_B, P_A, P_W, P_UV), rgbawu)) for p in PARS}
-    par_color_ids[name] = scene(f"PAR {name}", "PAR/Couleurs", vals)
+for name, c, _ in PAR_COLORS:
+    par_color_ids[name] = scene(f"PAR {name}", "PAR/Couleurs",
+                                {p: dict(zip(CH6, c)) for p in PARS}, COLOR_FADE, COLOR_FADE)
 
-# Split pair / impair
-def split(c1, c2):
-    a = dict(zip((P_R, P_G, P_B, P_A, P_W, P_UV), c1))
-    b = dict(zip((P_R, P_G, P_B, P_A, P_W, P_UV), c2))
-    return {p: (a if i % 2 == 0 else b) for i, p in enumerate(PARS)}
 
-par_color_ids["Rouge / Bleu"] = scene("PAR Rouge / Bleu", "PAR/Couleurs",
-                                      split((255, 0, 0, 0, 0, 0), (0, 0, 255, 0, 0, 0)))
+def split(name, c1, c2):
+    a, b = dict(zip(CH6, PC[c1])), dict(zip(CH6, PC[c2]))
+    return scene(f"PAR {name}", "PAR/Couleurs",
+                 {p: (a if i % 2 == 0 else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
 
-# Strobe / blinder (flash)
+
+def sides(name, c_out, c_in):
+    """extérieur / centre : 3 PAR de chaque bord vs les 6 du milieu"""
+    a, b = dict(zip(CH6, PC[c_out])), dict(zip(CH6, PC[c_in]))
+    return scene(f"PAR {name}", "PAR/Couleurs",
+                 {p: (a if i < 3 or i >= 9 else b) for i, p in enumerate(PARS)}, COLOR_FADE, COLOR_FADE)
+
+
+SPLITS = [
+    ("Rouge / Ambre", split("Rouge / Ambre", "Rouge", "Ambre"), 0xC04010),
+    ("Bleu / Ambre", split("Bleu / Ambre", "Bleu", "Ambre"), 0x606090),
+    ("Rouge / Bleu", split("Rouge / Bleu", "Rouge", "Bleu"), 0x902070),
+    ("Magenta / Cyan", split("Magenta / Cyan", "Magenta", "Cyan"), 0x9070C0),
+    ("Bords bleus", sides("Bords bleus", "Bleu nuit", "Ambre"), 0x506080),
+    ("Bords rouges", sides("Bords rouges", "Rouge", "Blanc chaud"), 0xC07070),
+]
+
+# Effets PAR (RGB Matrix, synchronisés au tap tempo)
+FX = {
+    "Vague rouge": matrix("PAR Vague rouge", "Waves", 0xFF0000,
+                          props={"taillength": "70", "tailfade": "Yes", "direction": "Right"}),
+    "Vague bleue": matrix("PAR Vague bleue", "Waves", 0x0030FF,
+                          props={"taillength": "70", "tailfade": "Yes", "direction": "Out"}),
+    "Pair / Impair": matrix("PAR Pair/Impair rouge-blanc", "Even/Odd", 0xFF0000, 0xFFC890),
+    "Alterné ambre/bleu": matrix("PAR Alterné ambre/bleu", "Alternate", 0xFF8000, 0x0020FF),
+    "Un par un": matrix("PAR Un par un", "One By One", 0xFFFFFF),
+    "Remplir centre": matrix("PAR Remplir centre", "Fill Unfill From Center", 0xFF5000),
+    "Arc-en-ciel": matrix("PAR Arc-en-ciel", "Gradient", 0xFF0000,
+                          props={"presetIndex": "Rainbow"}, duration=60),
+    "Plasma lent": matrix("PAR Plasma lent", "Plasma (Colors)", 0xFF0000, duration=120,
+                          props={"presetIndex": "Rainbow"}),
+}
+FX["Chase couleurs"] = chaser("PAR Chase couleurs", "PAR/Effets",
+                              [par_color_ids[c] for c in ("Rouge", "Bleu", "Ambre", "Magenta")],
+                              fade=150)
+# effets qui suivent le tempo (1 pas = 1 temps)
+TEMPO_FX = [FX[k] for k in ("Vague rouge", "Vague bleue", "Pair / Impair", "Alterné ambre/bleu",
+                            "Un par un", "Remplir centre", "Chase couleurs")]
+
+# Flash
 strobe_par = scene("PAR Strobe blanc", "PAR/Flash",
-                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 230} for p in PARS})
+                   {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_W: 255, P_STROBE: 235} for p in PARS})
 blinder = scene("PAR Blinder", "PAR/Flash",
                 {p: {P_DIM: 255, P_R: 255, P_G: 255, P_B: 255, P_A: 255, P_W: 255} for p in PARS})
+strobe_rand = matrix("PAR Strobe aléatoire", "Random Single", 0xFFFFFF, duration=40)
 
-# Effets PAR
-chase_cols = chaser("PAR Chase couleurs", "PAR/Effets",
-                    [par_color_ids[c] for c in ("Rouge", "Bleu", "Ambre", "Magenta")])
-fx_wave = matrix("PAR Vague rouge", "Waves", 0xFF0000, props={"taillength": "60", "tailfade": "Yes"})
-fx_one = matrix("PAR Un par un", "One By One", 0x0040FF)
-fx_evenodd = matrix("PAR Pair/Impair", "Even/Odd", 0xFF0000, 0x0000FF)
-fx_rainbow = matrix("PAR Arc-en-ciel", "Gradient", 0xFF0000, props={"presetIndex": "Rainbow"},
-                    duration=80)
-fx_center = matrix("PAR Remplir centre", "Fill Unfill From Center", 0xFFA000)
-fx_random = matrix("PAR Aléatoire", "Random Single", 0xFFFFFF, duration=120)
-
-# ---------------------------------------------------------------- Têtes
+# ================================================================ Têtes
 HEAD_COLORS = [("Blanc", 3, 0xF0F0F0), ("Rouge", 10, 0xD01010), ("Orange", 17, 0xFF7A10),
                ("Jaune", 24, 0xF0E010), ("Vert", 31, 0x10B030), ("Bleu", 38, 0x1030E0),
                ("CTO", 45, 0xFFC080), ("Cyan", 52, 0x20E0E0), ("Magenta", 59, 0xE020C0),
-               ("Arc-en-ciel", 200, 0x909090)]
-head_color_ids = {}
+               ("Arc-en-ciel", 205, 0x707070)]
+head_color = {}
 for name, val, _ in HEAD_COLORS:
-    head_color_ids[name] = scene(f"Têtes {name}", "Têtes/Couleurs",
-                                 {h: {H_COLOR: val, H_STROBE: H_SHUTTER_OPEN, H_FUNC: 0, H_MACRO: 0}
-                                  for h in HEADS})
+    head_color[name] = scene(f"Têtes {name}", "Têtes/Couleurs",
+                             {h: {H_COLOR: val, H_STROBE: H_SHUTTER_OPEN, H_FUNC: 0, H_MACRO: 0}
+                              for h in HEADS})
 
 GOBOS = [("Ouvert", 3)] + [(f"Gobo {i}", 3 + 8 * i) for i in range(1, 8)]
-gobo_ids = {}
+gobo = {}
 for name, val in GOBOS:
-    gobo_ids[name] = scene(f"Têtes {name}", "Têtes/Gobos",
-                           {h: {H_GOBO: val, H_GROT: 0, H_STROBE: H_SHUTTER_OPEN} for h in HEADS})
+    gobo[name] = scene(f"Têtes {name}", "Têtes/Gobos",
+                       {h: {H_GOBO: val, H_GROT: 0, H_FOCUS: 128, H_STROBE: H_SHUTTER_OPEN}
+                        for h in HEADS})
 gobo_rot = scene("Têtes Rotation gobo", "Têtes/FX", {h: {H_GROT: 40} for h in HEADS})
+gobo_rot_fast = scene("Têtes Rotation rapide", "Têtes/FX", {h: {H_GROT: 100} for h in HEADS})
 prism = scene("Têtes Prisme", "Têtes/FX", {h: {H_PRISM: 128} for h in HEADS})
 strobe_heads = scene("Têtes Strobe", "Têtes/FX",
                      {h: {H_DIM: 255, H_COLOR: 3, H_STROBE: 60} for h in HEADS})
 
 # Positions : (pan, tilt) par tête, de gauche à droite. Points de départ à ajuster sur place.
+POS_FADE = 1200
 POSITIONS = [
     ("Centre", [(128, 128)] * 4),
     ("Public", [(128, 70)] * 4),
@@ -218,23 +260,50 @@ POSITIONS = [
     ("Chanteur", [(140, 175), (134, 180), (122, 180), (116, 175)]),
     ("Croisé", [(150, 160), (140, 160), (116, 160), (106, 160)]),
     ("Éventail", [(100, 90), (118, 90), (138, 90), (156, 90)]),
+    ("V inversé", [(106, 120), (122, 100), (134, 100), (150, 120)]),
     ("Plafond", [(128, 30)] * 4),
 ]
-pos_ids = {}
+pos = {}
 for name, pts in POSITIONS:
-    pos_ids[name] = scene(f"Position {name}", "Têtes/Positions",
-                          {h: {H_PAN: p, H_PANF: 0, H_TILT: t, H_TILTF: 0, H_SPEED: 0}
-                           for h, (p, t) in zip(HEADS, pts)}, fade_in=0)
+    pos[name] = scene(f"Position {name}", "Têtes/Positions",
+                      {h: {H_PAN: p, H_PANF: 0, H_TILT: t, H_TILTF: 0, H_SPEED: 0}
+                       for h, (p, t) in zip(HEADS, pts)}, POS_FADE)
 
-efx_ids = {
-    "Cercle": efx("Têtes Cercle", "Circle", 40, 40),
-    "Huit": efx("Têtes Huit", "Eight", 50, 40),
-    "Balayage": efx("Têtes Balayage", "Line", 80, 10, xfreq=1, yfreq=1),
-    "Diamant": efx("Têtes Diamant", "Diamond", 40, 40),
-    "Ballyhoo": efx("Têtes Ballyhoo", "Lissajous", 70, 50, duration=6000),
+MOVES = {
+    "Cercle": efx("Têtes Cercle", "Circle", 22, 30),
+    "Huit": efx("Têtes Huit", "Eight", 28, 30),
+    "Balayage lent": efx("Têtes Balayage lent", "Line", 32, 6, duration=12000, xfreq=1, yfreq=1,
+                         offsets=(0, 0, 180, 180)),
+    "Vague tilt": efx("Têtes Vague tilt", "Line", 4, 40, duration=6000, xfreq=1, yfreq=1),
+    "Diamant": efx("Têtes Diamant", "Diamond", 22, 30),
+    "Ballyhoo": efx("Têtes Ballyhoo", "Lissajous", 40, 45, duration=10000),
 }
 
-# ---------------------------------------------------------------- Virtual Console
+# ================================================================ Looks (tout le rig)
+LOOKS = [  # nom, couleur bouton, [fonctions]
+    ("INTRO", 0x101870, [par_color_ids["Bleu nuit"], head_color["Bleu"], gobo["Gobo 2"], gobo_rot,
+                         pos["Public"], MOVES["Balayage lent"]]),
+    ("COUPLET", 0xFF9A10, [par_color_ids["Ambre"], head_color["CTO"], gobo["Ouvert"], pos["Band"]]),
+    ("PRÉ-REFRAIN", 0x9070C0, [FX["Alterné ambre/bleu"], head_color["Magenta"], gobo["Gobo 3"],
+                               pos["Éventail"], MOVES["Vague tilt"]]),
+    ("REFRAIN", 0xD01010, [par_color_ids["Rouge"], head_color["Blanc"], gobo["Gobo 1"],
+                           pos["Croisé"], MOVES["Huit"]]),
+    ("GROS REFRAIN", 0xFF2020, [FX["Pair / Impair"], head_color["Blanc"], gobo["Ouvert"], prism,
+                                pos["Éventail"], MOVES["Ballyhoo"]]),
+    ("BALLADE", 0x7A30E0, [FX["Plasma lent"], head_color["Magenta"], gobo["Gobo 5"], gobo_rot,
+                           pos["Chanteur"]]),
+    ("SOLO GUITARE", 0xFFB800, [par_color_ids["Rouge sang"], head_color["Blanc"], gobo["Ouvert"],
+                                pos["Centre"]]),
+    ("ÉNERGIE", 0xFF4000, [FX["Vague rouge"], head_color["Rouge"], gobo["Gobo 4"], gobo_rot_fast,
+                           pos["V inversé"], MOVES["Cercle"]]),
+    ("PSYCHÉ", 0x20C0A0, [FX["Arc-en-ciel"], head_color["Arc-en-ciel"], gobo["Gobo 6"], gobo_rot,
+                          prism, pos["Plafond"], MOVES["Ballyhoo"]]),
+    ("FINAL", 0xFFF0D0, [par_color_ids["Blanc chaud"], head_color["Blanc"], gobo["Ouvert"],
+                         pos["Public"]]),
+]
+look_ids = [(n, bg, collection(f"LOOK {n}", "Looks", m)) for n, bg, m in LOOKS]
+
+# ================================================================ Virtual Console
 vc = ET.SubElement(ws, "VirtualConsole")
 _wid = [0]
 
@@ -244,13 +313,13 @@ def wid():
     return str(_wid[0])
 
 
-def appearance(parent, bg=None, fg=None, style="None"):
+def appearance(parent, bg=None, fg=None, style="None", font=None):
     a = ET.SubElement(parent, "Appearance")
     ET.SubElement(a, "FrameStyle").text = style
     ET.SubElement(a, "ForegroundColor").text = str(0xFF000000 | fg) if fg is not None else "Default"
     ET.SubElement(a, "BackgroundColor").text = str(0xFF000000 | bg) if bg is not None else "Default"
     ET.SubElement(a, "BackgroundImage").text = "None"
-    ET.SubElement(a, "Font").text = "Default"
+    ET.SubElement(a, "Font").text = font or "Default"
 
 
 def winstate(parent, x, y, w, h):
@@ -258,7 +327,7 @@ def winstate(parent, x, y, w, h):
                                           "Width": str(w), "Height": str(h)})
 
 
-def frame(parent, caption, x, y, w, h, solo=False, bg=None):
+def frame(parent, caption, x, y, w, h, solo=False, bg=0x202020):
     f = ET.SubElement(parent, "SoloFrame" if solo else "Frame", {"Caption": caption, "ID": wid()})
     appearance(f, bg=bg, style="Sunken")
     winstate(f, x, y, w, h)
@@ -277,10 +346,14 @@ def text_color_for(bg):
     return 0x000000 if (r * 299 + g * 587 + b * 114) / 1000 > 140 else 0xFFFFFF
 
 
-def button(parent, caption, fid, x, y, w=105, h=80, action="Toggle", bg=None, key=None):
+BOLD = "Sans Serif,11,-1,5,75,0,0,0,0,0"
+BIG = "Sans Serif,13,-1,5,75,0,0,0,0,0"
+
+
+def button(parent, caption, fid, x, y, w=100, h=64, action="Toggle", bg=None, key=None, font=None):
     b = ET.SubElement(parent, "Button", {"Caption": caption, "ID": wid(), "Icon": ""})
     winstate(b, x, y, w, h)
-    appearance(b, bg=bg, fg=text_color_for(bg) if bg is not None else None)
+    appearance(b, bg=bg, fg=text_color_for(bg) if bg is not None else None, font=font)
     ET.SubElement(b, "Function", {"ID": str(fid)})
     ET.SubElement(b, "Action").text = action
     if key:
@@ -289,17 +362,17 @@ def button(parent, caption, fid, x, y, w=105, h=80, action="Toggle", bg=None, ke
     return b
 
 
-def grid(parent, items, cols, w=105, h=80, gap=8, top=35, left=10, action="Toggle"):
+def grid(parent, items, cols, w=100, h=64, gap=8, top=35, left=10, action="Toggle", font=None):
     for i, (cap, fid, bg) in enumerate(items):
         r, c = divmod(i, cols)
-        button(parent, cap, fid, left + c * (w + gap), top + r * (h + gap), w, h, action, bg)
+        button(parent, cap, fid, left + c * (w + gap), top + r * (h + gap), w, h, action, bg, font=font)
 
 
-def level_slider(parent, caption, channels, x, y, w=90, h=260, value=255):
+def level_slider(parent, caption, channels, x, y, w=90, h=250, value=255):
     s = ET.SubElement(parent, "Slider", {"Caption": caption, "ID": wid(), "WidgetStyle": "Slider",
                                          "InvertedAppearance": "false"})
     winstate(s, x, y, w, h)
-    appearance(s)
+    appearance(s, font=BOLD)
     ET.SubElement(s, "SliderMode", {"ValueDisplayStyle": "Percentage",
                                     "ClickAndGoType": "None", "Monitor": "false"}).text = "Level"
     lv = ET.SubElement(s, "Level", {"LowLimit": "0", "HighLimit": "255", "Value": str(value)})
@@ -309,57 +382,57 @@ def level_slider(parent, caption, channels, x, y, w=90, h=260, value=255):
     ET.SubElement(pb, "Function").text = "4294967295"
 
 
+NO_FUNC = 4294967295
 root = ET.SubElement(vc, "Frame", {"Caption": ""})
-appearance(root, bg=0x1A1A1A)
+appearance(root, bg=0x121212)
 
-# --- PAR (couleurs + effets dans le même solo frame = un seul look à la fois)
-f = frame(root, "PAR — COULEURS & EFFETS", 10, 10, 670, 320, solo=True)
-items = [(n, par_color_ids[n], bg) for n, _, bg in PAR_COLORS] + \
-        [("Rouge / Bleu", par_color_ids["Rouge / Bleu"], 0x902090)]
-fx_items = [("Chase couleurs", chase_cols, 0x404040), ("Vague", fx_wave, 0x404040),
-            ("Un par un", fx_one, 0x404040), ("Pair / Impair", fx_evenodd, 0x404040),
-            ("Arc-en-ciel", fx_rainbow, 0x404040), ("Remplir centre", fx_center, 0x404040)]
-grid(f, items + fx_items, cols=6, w=100)
+# --- Rangée 1 : LOOKS
+f = frame(root, "LOOKS DU SHOW — un bouton = tout le rig", 10, 10, 1840, 125, solo=True, bg=0x2A1010)
+grid(f, [(n, fid, bg) for n, bg, fid in look_ids], cols=10, w=174, h=80, font=BIG)
 
-# --- Masters + tempo
-f = frame(root, "MASTERS", 10, 340, 670, 310)
+# --- PAR
+f = frame(root, "PAR — COULEURS", 10, 145, 670, 255, solo=True)
+items = [(n, par_color_ids[n], bg) for n, _, bg in PAR_COLORS] + list(SPLITS)
+grid(f, items, cols=7, w=86, h=64)
+f = frame(root, "PAR — EFFETS (suivent le tempo)", 10, 410, 670, 175, solo=True)
+grid(f, [(n, fid, 0x3A3A3A) for n, fid in FX.items()], cols=5, w=122, h=60)
+
+# --- Masters / tempo / flash
+f = frame(root, "MASTERS & TEMPO", 10, 595, 670, 305)
 level_slider(f, "PAR", [(p, P_DIM) for p in PARS], 15, 35)
-level_slider(f, "Têtes", [(h, H_DIM) for h in HEADS], 115, 35)
-sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO (tap)", "ID": wid()})
-winstate(sd, 230, 35, 220, 260)
-appearance(sd)
+level_slider(f, "TÊTES", [(h, H_DIM) for h in HEADS], 115, 35)
+sd = ET.SubElement(f, "SpeedDial", {"Caption": "TEMPO — tape le beat", "ID": wid()})
+winstate(sd, 220, 35, 230, 255)
+appearance(sd, font=BOLD)
 ET.SubElement(sd, "AbsoluteValue", {"Minimum": "0", "Maximum": "10000"})
 ET.SubElement(sd, "Time").text = "500"
-for fid_ in (chase_cols, fx_wave, fx_one, fx_evenodd, fx_center, fx_random):
+for fid_ in TEMPO_FX:
     ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "6"}).text = str(fid_)
-for fid_ in efx_ids.values():  # 1 tour d'EFX = 8 temps
-    ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "9"}).text = str(fid_)
-button(f, "PAR Aléatoire", fx_random, 465, 35, 210, 80, bg=0x404040)
-button(f, "Strobe PAR\n(maintenir)", strobe_par, 465, 125, 100, 80, action="Flash", bg=0xFFFFFF, key="S")
-button(f, "Blinder\n(maintenir)", blinder, 575, 125, 100, 80, action="Flash", bg=0xFFE070, key="B")
-button(f, "Strobe têtes\n(maintenir)", strobe_heads, 465, 215, 100, 80, action="Flash", bg=0xC0C0C0, key="D")
+for k in ("Cercle", "Huit", "Diamant"):  # 1 tour = 8 temps
+    ET.SubElement(sd, "Function", {"FadeIn": "0", "FadeOut": "0", "Duration": "9"}).text = str(MOVES[k])
+button(f, "STROBE\nPAR", strobe_par, 465, 35, 95, 80, "Flash", 0xFFFFFF, "S", BOLD)
+button(f, "BLINDER", blinder, 568, 35, 95, 80, "Flash", 0xFFE070, "B", BOLD)
+button(f, "STROBE TÊTES", strobe_heads, 465, 123, 95, 80, "Flash", 0xC8C8C8, "D", BOLD)
+button(f, "STROBE FOU", strobe_rand, 568, 123, 95, 80, "Flash", 0xA0A0FF, "F", BOLD)
+button(f, "BLACKOUT", NO_FUNC, 465, 211, 95, 80, "Blackout", 0x000000, "X", BOLD)
+b = button(f, "FONDU\nAU NOIR", NO_FUNC, 568, 211, 95, 80, "StopAll", 0x602020, "N", BOLD)
+b.find("Action").set("FadeOut", "2000")
 
-# --- Urgence
-f = frame(root, "GÉNÉRAL", 10, 660, 670, 140)
-button(f, "BLACKOUT", 4294967295, 10, 35, 220, 95, action="Blackout", bg=0x000000, key="X")
-b = button(f, "TOUT ARRÊTER", 4294967295, 240, 35, 220, 95, action="StopAll", bg=0x802020)
-b.find("Action").set("FadeOut", "0")
+# --- Têtes
+f = frame(root, "TÊTES — COULEUR", 690, 145, 560, 175, solo=True)
+grid(f, [(n, head_color[n], bg) for n, _, bg in HEAD_COLORS], cols=5)
+f = frame(root, "TÊTES — GOBO", 690, 330, 560, 175, solo=True)
+grid(f, [(n, gobo[n], 0x303058) for n, _ in GOBOS], cols=5)
+f = frame(root, "TÊTES — FX", 690, 515, 560, 110)
+grid(f, [("Rotation gobo", gobo_rot, 0x2F5A2F), ("Rotation rapide", gobo_rot_fast, 0x2F5A2F),
+         ("Prisme", prism, 0x2F5A2F)], cols=5)
 
-# --- Têtes : couleurs / gobos / fx
-f = frame(root, "TÊTES — COULEUR", 690, 10, 560, 220, solo=True)
-grid(f, [(n, head_color_ids[n], bg) for n, _, bg in HEAD_COLORS], cols=5, w=100)
-f = frame(root, "TÊTES — GOBO", 690, 240, 560, 220, solo=True)
-grid(f, [(n, gobo_ids[n], 0x303050) for n, _ in GOBOS], cols=5, w=100)
-f = frame(root, "TÊTES — FX", 690, 470, 560, 130)
-grid(f, [("Rotation gobo", gobo_rot, 0x305030), ("Prisme", prism, 0x305030)], cols=5, w=100)
+f = frame(root, "TÊTES — POSITION (fondu 1,2 s)", 1260, 145, 590, 175, solo=True)
+grid(f, [(n, pos[n], 0x204060) for n, _ in POSITIONS], cols=5, w=106)
 
-# --- Positions / XY pad / mouvements
-f = frame(root, "TÊTES — POSITION", 1260, 10, 560, 220, solo=True)
-grid(f, [(n, pos_ids[n], 0x204060) for n, _ in POSITIONS], cols=5, w=100)
-
-xy = ET.SubElement(root, "XYPad", {"Caption": "POSITION LIVE (4 têtes)", "ID": wid(),
+xy = ET.SubElement(root, "XYPad", {"Caption": "VISER EN LIVE (4 têtes)", "ID": wid(),
                                    "InvertedAppearance": "0"})
-winstate(xy, 1260, 240, 280, 360)
+winstate(xy, 1260, 330, 290, 295)
 appearance(xy)
 for h in HEADS:
     fx = ET.SubElement(xy, "Fixture", {"ID": str(h), "Head": "0"})
@@ -368,8 +441,20 @@ for h in HEADS:
 ET.SubElement(xy, "Pan", {"Position": "127"})
 ET.SubElement(xy, "Tilt", {"Position": "127"})
 
-f = frame(root, "TÊTES — MOUVEMENT", 1550, 240, 270, 360, solo=True)
-grid(f, [(n, i, 0x603060) for n, i in efx_ids.items()], cols=2, w=120, h=70)
+f = frame(root, "TÊTES — MOUVEMENT", 1560, 330, 290, 295, solo=True)
+grid(f, [(n, i, 0x5A2A5A) for n, i in MOVES.items()], cols=2, w=130, h=72)
+
+f = frame(root, "AIDE", 690, 635, 1160, 265, bg=0x181818)
+lab = ET.SubElement(f, "Label", {"Caption": (
+    "1. Choisis un LOOK en haut → tout le rig change avec des fondus.\n"
+    "2. Raffine en live : une couleur PAR, un gobo ou une position par-dessus le look.\n"
+    "3. Tape le beat sur TEMPO : les effets PAR et les mouvements suivent la toune.\n"
+    "4. Flash en maintenant : S strobe PAR · B blinder · D strobe têtes · F strobe fou.\n"
+    "5. Fin de toune : FONDU AU NOIR (N) ou BLACKOUT (X).\n"
+    "Les mouvements bougent autour de la position active : garde toujours une position allumée."),
+    "ID": wid()})
+winstate(lab, 10, 35, 1140, 220)
+appearance(lab, fg=0xDDDDDD, font=BOLD)
 
 props = ET.SubElement(vc, "Properties")
 ET.SubElement(props, "Size", {"Width": "1920", "Height": "1080"})
@@ -378,8 +463,8 @@ ET.SubElement(props, "GrandMaster", {"ChannelMode": "Intensity", "ValueMode": "R
 
 # ---------------------------------------------------------------- Écriture
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
-xml = minidom.parseString(ET.tostring(ws, encoding="unicode")).toprettyxml(indent=" ")
-xml = xml.replace('<?xml version="1.0" ?>', '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE Workspace>', 1)
+ET.indent(ws, space=" ")
+xml = '<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE Workspace>\n' + ET.tostring(ws, encoding="unicode") + "\n"
 with open(OUT, "w", encoding="utf-8") as fh:
     fh.write(xml)
 print(f"OK -> {os.path.abspath(OUT)}  ({_fid[0]} fonctions, {_wid[0]} widgets)")

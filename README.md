@@ -29,17 +29,39 @@ Profil de fixture QLC+ (`.qxf`) pour la Chauvet Intimidator Spot 260X, modes **1
 
 Sur chaque PAR : menu → mode **11CH** et l'adresse de la table.
 
+## Comment jouer
+1. **Choisis un LOOK** dans la rangée du haut : tout le rig change d'un coup, avec des fondus.
+2. **Raffine en live** : une couleur PAR, un gobo, une position ou un mouvement par-dessus le look. Le bouton remplace juste cette partie-là.
+3. **Tape le beat** sur TEMPO : les effets PAR et les mouvements suivent la toune.
+4. **Fin de toune** : FONDU AU NOIR (2 s) ou BLACKOUT.
+
+## Les looks
+
+| Look | PAR | Têtes |
+|---|---|---|
+| **INTRO** | Bleu nuit + UV | Bleu, gobo 2 qui tourne, balayage lent sur le public |
+| **COUPLET** | Ambre | CTO ouvert sur le band |
+| **PRÉ-REFRAIN** | Alterné ambre/bleu (tempo) | Magenta, gobo 3, en éventail, vague de tilt |
+| **REFRAIN** | Rouge | Blanc gobo 1, croisées, en huit |
+| **GROS REFRAIN** | Pair/impair rouge-blanc (tempo) | Blanc + prisme, éventail, ballyhoo |
+| **BALLADE** | Plasma lent | Magenta, gobo 5 qui tourne, sur le chanteur |
+| **SOLO GUITARE** | Rouge sang | Blanc ouvert au centre |
+| **ÉNERGIE** | Vague rouge (tempo) | Rouge, gobo 4 en rotation rapide, V inversé, cercle |
+| **PSYCHÉ** | Arc-en-ciel | Arc-en-ciel, gobo 6, prisme, ballyhoo au plafond |
+| **FINAL** | Blanc chaud | Blanc sur le public |
+
 ## La Virtual Console
 
 | Zone | Ce que ça fait |
 |---|---|
-| **PAR — Couleurs & effets** | 12 couleurs + 6 effets (chase, vague, un par un, pair/impair, arc-en-ciel, remplir du centre). Un seul look à la fois. |
-| **Masters** | Fader **PAR** (dimmer des 12 PAR) et fader **Têtes**. **TEMPO** : tape le beat sur *Tap* pour synchroniser chases, effets et mouvements. |
-| **Flash** (maintenir) | Strobe PAR `S`, Blinder `B`, Strobe têtes `D`, PAR Aléatoire |
-| **Général** | **BLACKOUT** `X`, **TOUT ARRÊTER** |
-| **Têtes — Couleur / Gobo / FX** | Roue de couleurs, 7 gobos + ouvert, rotation gobo, prisme |
-| **Têtes — Position** | 7 positions de départ + **pad XY** pour viser en live |
-| **Têtes — Mouvement** | Cercle, Huit, Balayage, Diamant, Ballyhoo. Ces mouvements sont **relatifs** : ils bougent autour de la position active, alors garde toujours une position allumée. |
+| **PAR — Couleurs** | 14 couleurs + 6 combinaisons (pair/impair, bords/centre). Fondu de 0,4 s entre les couleurs. |
+| **PAR — Effets** | Vagues, pair/impair, alterné, un par un, remplir du centre, arc-en-ciel, plasma, chase |
+| **Masters & tempo** | Fader **PAR** et fader **TÊTES** (dimmers). **TEMPO** : tape le beat sur *Tap*. |
+| **Flash** (maintenir) | Strobe PAR `S`, Blinder `B`, Strobe têtes `D`, Strobe fou `F` |
+| **Urgence** | **BLACKOUT** `X`, **FONDU AU NOIR** `N` (arrête tout en 2 s) |
+| **Têtes — Couleur / Gobo / FX** | Roue de couleurs, 7 gobos + ouvert, rotation lente/rapide, prisme |
+| **Têtes — Position** | 8 positions avec fondu de 1,2 s + **pad XY** pour viser en live |
+| **Têtes — Mouvement** | Cercle, huit, balayage lent, vague tilt, diamant, ballyhoo. Ils sont **relatifs** : ils bougent autour de la position active, alors garde toujours une position allumée. |
 
 Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces scènes ouvrent le shutter.
 
