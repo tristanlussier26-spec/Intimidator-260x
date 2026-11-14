@@ -3117,7 +3117,7 @@
      <Intensity Adjust="False">100</Intensity>
     </Button>
    </Frame>
-   <Frame Caption="AIDE" ID="128">
+   <Frame Caption="STROBES ON/OFF (pour le Stream Deck)" ID="128">
     <Appearance>
      <FrameStyle>Sunken</FrameStyle>
      <ForegroundColor>Default</ForegroundColor>
@@ -3132,8 +3132,64 @@
     <ShowEnableButton>False</ShowEnableButton>
     <Collapsed>False</Collapsed>
     <Disabled>False</Disabled>
-    <Label Caption="1. Choisis un LOOK (ou ▶ AUTO : un look aux 16 temps).&#10;2. Raffine : couleur, gobo, position par-dessus.&#10;3. Tape le beat sur TEMPO (touche T).&#10;4. Flash : S B D F · bumps G H J K L M&#10;5. Fin de toune : FONDU (N) · BLACKOUT (X)&#10;Stream Deck : voir le tableau des touches du README." ID="129">
-     <WindowState Visible="False" X="10" Y="35" Width="570" Height="190" />
+    <Button Caption="STROBE PAR&#10;on/off" ID="129" Icon="">
+     <WindowState Visible="False" X="10" Y="35" Width="134" Height="70" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>4278190080</ForegroundColor>
+      <BackgroundColor>4294967295</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <Function ID="32" />
+     <Action>Toggle</Action>
+     <Key>Alt+Shift+K</Key>
+     <Intensity Adjust="False">100</Intensity>
+    </Button>
+    <Button Caption="BLINDER&#10;on/off" ID="130" Icon="">
+     <WindowState Visible="False" X="152" Y="35" Width="134" Height="70" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>4278190080</ForegroundColor>
+      <BackgroundColor>4294959216</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <Function ID="33" />
+     <Action>Toggle</Action>
+     <Key>Alt+Shift+L</Key>
+     <Intensity Adjust="False">100</Intensity>
+    </Button>
+    <Button Caption="STROBE TÊTES&#10;on/off" ID="131" Icon="">
+     <WindowState Visible="False" X="294" Y="35" Width="134" Height="70" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>4278190080</ForegroundColor>
+      <BackgroundColor>4291348680</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <Function ID="64" />
+     <Action>Toggle</Action>
+     <Key>Alt+Shift+M</Key>
+     <Intensity Adjust="False">100</Intensity>
+    </Button>
+    <Button Caption="STROBE FOU&#10;on/off" ID="132" Icon="">
+     <WindowState Visible="False" X="436" Y="35" Width="134" Height="70" />
+     <Appearance>
+      <FrameStyle>None</FrameStyle>
+      <ForegroundColor>4278190080</ForegroundColor>
+      <BackgroundColor>4288717055</BackgroundColor>
+      <BackgroundImage>None</BackgroundImage>
+      <Font>Sans Serif,11,-1,5,75,0,0,0,0,0</Font>
+     </Appearance>
+     <Function ID="39" />
+     <Action>Toggle</Action>
+     <Key>Alt+Shift+N</Key>
+     <Intensity Adjust="False">100</Intensity>
+    </Button>
+    <Label Caption="LOOK en haut · TEMPO = T · flash maintenus : S B D F, bumps G-M&#10;Fin de toune : FONDU (N) · BLACKOUT (X) · Stream Deck : README" ID="133">
+     <WindowState Visible="False" X="10" Y="115" Width="570" Height="105" />
      <Appearance>
       <FrameStyle>None</FrameStyle>
       <ForegroundColor>4292730333</ForegroundColor>

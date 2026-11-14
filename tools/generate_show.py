@@ -603,16 +603,14 @@ grid(f, [("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xF
          ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
      cols=3, w=172, h=88, action="Flash", font=BIG, keys=["G", "H", "J", "K", "L", "M"])
 
-f = frame(root, "AIDE", 1260, 748, 590, 230, bg=0x181818)
+f = frame(root, "STROBES ON/OFF (pour le Stream Deck)", 1260, 748, 590, 230, bg=0x181818)
+grid(f, [("STROBE PAR\non/off", strobe_par, 0xFFFFFF), ("BLINDER\non/off", blinder, 0xFFE070),
+         ("STROBE TÊTES\non/off", strobe_heads, 0xC8C8C8), ("STROBE FOU\non/off", strobe_rand, 0xA0A0FF)],
+     cols=4, w=134, h=70, font=BOLD, keys=L("Alt+Shift+", "KLMN"))
 lab = ET.SubElement(f, "Label", {"Caption": (
-    "1. Choisis un LOOK (ou ▶ AUTO : un look aux 16 temps).\n"
-    "2. Raffine : couleur, gobo, position par-dessus.\n"
-    "3. Tape le beat sur TEMPO (touche T).\n"
-    "4. Flash : S B D F · bumps G H J K L M\n"
-    "5. Fin de toune : FONDU (N) · BLACKOUT (X)\n"
-    "Stream Deck : voir le tableau des touches du README."),
-    "ID": wid()})
-winstate(lab, 10, 35, 570, 190)
+    "LOOK en haut · TEMPO = T · flash maintenus : S B D F, bumps G-M\n"
+    "Fin de toune : FONDU (N) · BLACKOUT (X) · Stream Deck : README"), "ID": wid()})
+winstate(lab, 10, 115, 570, 105)
 appearance(lab, fg=0xDDDDDD, font=BOLD)
 
 props = ET.SubElement(vc, "Properties")

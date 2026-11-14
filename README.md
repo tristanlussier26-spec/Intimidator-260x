@@ -99,6 +99,18 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 
 ## Stream Deck
 
+### Profil prêt à importer (Stream Deck XL)
+![Aperçu Stream Deck](show/apercu-streamdeck.png)
+
+1. Télécharge **`show/Show-Rock-XL.streamDeckProfile`**.
+2. Double-clique dessus (ou Stream Deck → Préférences → Profils → Importer).
+3. Choisis le profil **Show Rock (QLC+)** pour ton XL.
+
+Page principale : les 10 looks de la rangée 1, AUTO, TAP, les strobes **on/off** (un appui = on, un autre = off), les bumps et flashs, 3 positions rapides, FONDU et BLACKOUT. Les dossiers **LOOKS 2**, **LOOKS 3**, **PAR**, **TÊTES** et **POSITIONS** contiennent tout le reste.
+
+Le profil est généré par `tools/make_streamdeck.py` à partir du show : relance-le après chaque changement de raccourcis.
+
+### Les raccourcis
 Chaque bouton du board a un raccourci clavier. Sur le Stream Deck : glisse l'action **Système → Raccourci (Hotkey)** sur une touche et tape la combinaison du tableau.
 
 - QLC+ doit être **en avant-plan** et en **mode show (▶)** : le raccourci va à la fenêtre active.
