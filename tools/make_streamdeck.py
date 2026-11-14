@@ -98,26 +98,48 @@ def b32(u):
     return "".join(alphabet[int(bits[i:i + 5], 2)] for i in range(0, len(bits), 5)) + "Z"
 
 
-# ------------------------------------------------------------ pages
-pages = {}                      # page uuid -> (name, {(c, r): item})
+# ------------------------------------------------------------ titres (jamais coupés)
+SHORT = {"FEU D'ARTIFICE": "ARTIFICE", "COUCHER SOLEIL": "COUCHER\nSOLEIL", "PRÉ-REFRAIN": "PRÉ-\nREFRAIN",
+         "GROS REFRAIN": "GROS\nREFRAIN", "SOLO GUITARE": "SOLO\nGUITARE", "SPOT CHANTEUR": "SPOT\nCHANTEUR",
+         "SOLO BATTERIE": "SOLO\nBATTERIE", "Alterné ambre/bleu": "Alterné\nambre\nbleu",
+         "Remplir centre": "Remplir\ncentre", "Chase couleurs": "Chase\ncouleurs", "Rotation rapide": "Rotation\nrapide",
+         "Rotation gobo": "Rotation\ngobo", "Balayage lent": "Balayage\nlent", "Magenta / Cyan": "Magenta\nCyan",
+         "Blanc chaud": "Blanc\nchaud", "Blanc froid": "Blanc\nfroid", "Rouge sang": "Rouge\nsang",
+         "Bords bleus": "Bords\nbleus", "Bords rouges": "Bords\nrouges", "V inversé": "V\ninversé",
+         "Arc-en-ciel": "Arc-en-\nciel", "Plasma lent": "Plasma\nlent", "Fondu lent": "Fondu\nlent",
+         "Vague rouge": "Vague\nrouge", "Vague bleue": "Vague\nbleue", "Vague tilt": "Vague\ntilt",
+         "Pair / Impair": "Pair\nImpair", "Un par un": "Un par\nun", "Chase gobos": "Chase\ngobos",
+         "BLEU GLACE": "BLEU\nGLACE", "ROUGE & UV": "ROUGE\n& UV", "SOLO BASSE": "SOLO\nBASSE",
+         "ROCK BLANC": "ROCK\nBLANC", "OUVERTURE": "OUVER-\nTURE",
+         "ACOUSTIQUE": "ACOUS-\nTIQUE", "APOTHÉOSE": "APOTHÉ-\nOSE"}
+MAXC = 8
 
 
-def page(name, items, back=False):
-    pid = str(uuid.uuid4())
-    slots = [(c, r) for r in range(ROWS) for c in range(COLS)]
-    if back:
-        slots = slots[1:]
-    grid = {(0, 0): ("back",)} if back else {}
-    for slot, it in zip(slots, items):
-        if it is not None:
-            grid[slot] = it
-    assert len([i for i in items if i is not None]) <= len(slots), name
-    pages[pid] = (name, grid)
-    return pid
+def wrap(t):
+    t = SHORT.get(t.replace("\n", " "), t)
+    out = []
+    for line in t.split("\n"):
+        words, cur = line.split(" "), ""
+        for w in words:
+            if cur and len(cur) + 1 + len(w) > MAXC:
+                out.append(cur); cur = w
+            else:
+                cur = (cur + " " + w).strip()
+        out.append(cur)
+    return "\n".join(out)
 
 
-def folder(title, pid, col=0x444444):
-    return ("folder", title, pid, col)
+# ------------------------------------------------------------ pages (◀ ▶ en bas à droite)
+pages = []                      # [(uuid, name, {(c, r): item})]
+SLOTS = [(c, r) for r in range(ROWS) for c in range(COLS) if (c, r) not in ((6, 3), (7, 3))]
+
+
+def page(name, items):
+    assert len(items) <= len(SLOTS), (name, len(items))
+    grid = {slot: it for slot, it in zip(SLOTS, items) if it is not None}
+    grid[(6, 3)] = ("prev",)
+    grid[(7, 3)] = ("next",)
+    pages.append((str(uuid.uuid4()), name, grid))
 
 
 def look_row(mod):
@@ -129,71 +151,61 @@ def keyed(prefix, letters):
 
 
 auto = btn("F11", "▶ AUTO")
+fondu, blackout = btn("N", "FONDU\nNOIR"), btn("X", "BLACK-\nOUT")
+onoff = keyed("Alt+Shift+", "KLMNOPQRST")       # strobes, bumps, flashs (on/off)
+quick_pos = [btn("Shift+D", "→ CHAN-\nTEUR"), btn("Shift+C", "→ BAND"), btn("Shift+B", "→ PUBLIC")]
 
-p_looks2 = page("Looks 2", look_row("Shift+") + [None] * 10 + [auto, TAP], back=True)
-p_looks3 = page("Looks 3", look_row("Ctrl+") + [None] * 10 + [auto, TAP], back=True)
-p_par = page("PAR", keyed("Alt+", "ABCDEFGHIJKLMNOPQRST") + keyed("Alt+Shift+", "ABCDEFGHIJ"), back=True)
-p_heads = page("Têtes", keyed("Ctrl+Shift+", "ABCDEFGHIJ") + keyed("Ctrl+Shift+", "KLMNOPQR")
-               + keyed("Ctrl+Shift+", "TUVWY"), back=True)
-p_pos = page("Positions", keyed("Shift+", "ABCDEFGHIJK") + [None] * 5 + keyed("Shift+", "LMNOPQ")
-             + [None, None, TAP], back=True)
-
-main_items = (
-    look_row("")[:8]
-    + look_row("")[8:10] + [auto, TAP,
-                            folder("LOOKS 2 ▸", p_looks2, 0x5A2A5A), folder("LOOKS 3 ▸", p_looks3, 0x5A2A5A),
-                            folder("PAR ▸", p_par, 0x2F5A9A), folder("TÊTES ▸", p_heads, 0x9A3A2A)]
-    + [btn("Alt+Shift+K", "STROBE\nPAR"), btn("Alt+Shift+L", "BLINDER"),
-       btn("Alt+Shift+M", "STROBE\nTÊTES"), btn("Alt+Shift+N", "STROBE\nFOU"),
-       btn("G", "BUMP\nGAUCHE"), btn("H", "BUMP\nDROITE"),
-       btn("J", "FLASH\nROUGE"), btn("K", "FLASH\nBLEU")]
-    + [btn("L", "FLASH\nUV"), btn("M", "FLASH\nTÊTES"),
-       folder("POSITIONS ▸", p_pos, 0x204060),
-       btn("Shift+D", "→ Chanteur"), btn("Shift+C", "→ Band"), btn("Shift+B", "→ Public"),
-       btn("N", "FONDU\nAU NOIR"), btn("X", "BLACKOUT")]
-)
-p_main = page("Show Rock", main_items)
+page("1 SHOW", look_row("") + [auto, TAP] + onoff + quick_pos + [None] * 3 + [fondu, blackout])
+page("2 LOOKS", look_row("Shift+") + look_row("Ctrl+") + [auto, TAP, None, None, None, None, fondu, blackout])
+page("3 PAR", keyed("Alt+", "ABCDEFGHIJKLMNOPQRST") + keyed("Alt+Shift+", "ABCDEFGHIJ"))
+page("4 TÊTES", keyed("Ctrl+Shift+", "ABCDEFGHIJ") + keyed("Ctrl+Shift+", "KLMNOPQR")
+     + keyed("Ctrl+Shift+", "TUVWY") + [None, None, None, TAP, None, fondu, blackout])
+page("5 POSITIONS", keyed("Shift+", "ABCDEFGHIJK") + [None] * 5 + keyed("Shift+", "LMNOPQ")
+     + [None, None, TAP, None, fondu, blackout])
 
 # ------------------------------------------------------------ écriture
 prof_uuid = str(uuid.uuid4()).upper()
 root = f"{prof_uuid}.sdProfile"
 zf = zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED)
+ids = [p[0] for p in pages]
 zf.writestr(f"{root}/manifest.json", json.dumps({
     "AppIdentifier": "*",
     "Device": {"Model": MODEL, "UUID": ""},
     "Name": "Show Rock (QLC+)",
-    "Pages": {"Current": p_main, "Default": p_main, "Pages": [p_main]},
+    "Pages": {"Current": ids[0], "Default": ids[0], "Pages": ids},
     "Version": "2.0"}, ensure_ascii=False, indent=1))
 
-for pid, (name, grid) in pages.items():
+for pid, name, grid in pages:
     pdir = f"{root}/Profiles/{b32(pid)}"
     actions = {}
-    for n, ((c, r), it) in enumerate(sorted(grid.items(), key=lambda kv: (kv[0][1], kv[0][0]))):
+    for (c, r), it in sorted(grid.items(), key=lambda kv: (kv[0][1], kv[0][0])):
         aid = str(uuid.uuid4())
-        if it[0] == "back":
-            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Parent Folder",
-                                   "Settings": {}, "State": 0, "States": [{}],
-                                   "UUID": "com.elgato.streamdeck.profile.backtoparent"}
+        if it[0] in ("prev", "next"):
+            title = "◀\n" + "PAGE" if it[0] == "prev" else "PAGE\n▶"
+            img = f"Images/k{c}{r}.png"
+            zf.writestr(f"{pdir}/{img}", icon(0x202020, folder=False))
+            actions[f"{c},{r}"] = {
+                "ActionID": aid, "LinkedTitle": True,
+                "Name": "Previous Page" if it[0] == "prev" else "Next Page", "Settings": {}, "State": 0,
+                "States": [{"Image": img, "Title": title, "ShowTitle": True, "TitleAlignment": "middle",
+                            "TitleColor": "#ffffff", "FontSize": 10, "FontStyle": "Bold", "FontFamily": "",
+                            "FontUnderline": False, "OutlineThickness": 2}],
+                "UUID": "com.elgato.streamdeck.page." + ("previous" if it[0] == "prev" else "next")}
             continue
         kind, title, target, col = it
         img = f"Images/k{c}{r}.png"
-        zf.writestr(f"{pdir}/{img}", icon(col, folder=(kind == "folder")))
-        state = {"Image": img, "Title": title, "ShowTitle": True, "TitleAlignment": "middle",
-                 "TitleColor": text_color(col), "FontSize": 11, "FontStyle": "Bold",
+        zf.writestr(f"{pdir}/{img}", icon(col))
+        state = {"Image": img, "Title": wrap(title), "ShowTitle": True, "TitleAlignment": "middle",
+                 "TitleColor": text_color(col), "FontSize": 9, "FontStyle": "Bold",
                  "FontFamily": "", "FontUnderline": False, "OutlineThickness": 2}
-        if kind == "folder":
-            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Create Folder",
-                                   "Settings": {"ProfileUUID": target}, "State": 0, "States": [state],
-                                   "UUID": "com.elgato.streamdeck.profile.openchild"}
-        else:
-            actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Hotkey",
-                                   "Settings": hotkey_settings(target), "State": 0, "States": [state],
-                                   "UUID": "com.elgato.streamdeck.system.hotkey"}
+        actions[f"{c},{r}"] = {"ActionID": aid, "LinkedTitle": True, "Name": "Hotkey",
+                               "Settings": hotkey_settings(target), "State": 0, "States": [state],
+                               "UUID": "com.elgato.streamdeck.system.hotkey"}
     zf.writestr(f"{pdir}/manifest.json", json.dumps(
         {"Controllers": [{"Actions": actions, "Type": "Keypad"}], "Icon": "", "Name": name},
         ensure_ascii=False, indent=1))
 zf.close()
 
 print(f"OK -> {os.path.abspath(OUT)}")
-for pid, (name, grid) in pages.items():
-    print(f"  {name:10s} {len(grid):2d} touches")
+for pid, name, grid in pages:
+    print(f"  {name:12s} {len(grid):2d} touches")

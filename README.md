@@ -106,7 +106,14 @@ Les têtes s'allument dès que tu choisis une couleur ou un gobo, parce que ces 
 2. Double-clique dessus (ou Stream Deck → Préférences → Profils → Importer).
 3. Choisis le profil **Show Rock (QLC+)** pour ton XL.
 
-Page principale : les 10 looks de la rangée 1, AUTO, TAP, les strobes **on/off** (un appui = on, un autre = off), les bumps et flashs, 3 positions rapides, FONDU et BLACKOUT. Les dossiers **LOOKS 2**, **LOOKS 3**, **PAR**, **TÊTES** et **POSITIONS** contiennent tout le reste.
+**5 pages** (◀ PAGE / PAGE ▶ en bas à droite de chaque page) :
+1. **SHOW** : les 10 looks de la rangée 1, AUTO, TAP, strobes, bumps et flashs, 3 positions rapides, FONDU, BLACKOUT
+2. **LOOKS** : les 20 autres looks
+3. **PAR** : 20 couleurs et 10 effets
+4. **TÊTES** : couleurs, gobos, rotation, prisme, chases
+5. **POSITIONS** : 11 positions et 6 mouvements
+
+Le Stream Deck envoie une **impulsion** (pas de « maintenir ») : les strobes, bumps et flashs du profil sont donc des **on/off** (un appui = on, un appui = off).
 
 Le profil est généré par `tools/make_streamdeck.py` à partir du show : relance-le après chaque changement de raccourcis.
 

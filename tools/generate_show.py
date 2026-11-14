@@ -603,15 +603,13 @@ grid(f, [("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xF
          ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
      cols=3, w=172, h=88, action="Flash", font=BIG, keys=["G", "H", "J", "K", "L", "M"])
 
-f = frame(root, "STROBES ON/OFF (pour le Stream Deck)", 1260, 748, 590, 230, bg=0x181818)
-grid(f, [("STROBE PAR\non/off", strobe_par, 0xFFFFFF), ("BLINDER\non/off", blinder, 0xFFE070),
-         ("STROBE TÊTES\non/off", strobe_heads, 0xC8C8C8), ("STROBE FOU\non/off", strobe_rand, 0xA0A0FF)],
-     cols=4, w=134, h=70, font=BOLD, keys=L("Alt+Shift+", "KLMN"))
-lab = ET.SubElement(f, "Label", {"Caption": (
-    "LOOK en haut · TEMPO = T · flash maintenus : S B D F, bumps G-M\n"
-    "Fin de toune : FONDU (N) · BLACKOUT (X) · Stream Deck : README"), "ID": wid()})
-winstate(lab, 10, 115, 570, 105)
-appearance(lab, fg=0xDDDDDD, font=BOLD)
+f = frame(root, "ON/OFF (pour le Stream Deck : 1 appui = on, 1 appui = off)", 1260, 748, 590, 230, bg=0x181818)
+grid(f, [("STROBE\nPAR", strobe_par, 0xFFFFFF), ("BLINDER", blinder, 0xFFE070),
+         ("STROBE\nTÊTES", strobe_heads, 0xC8C8C8), ("STROBE\nFOU", strobe_rand, 0xA0A0FF),
+         ("BUMP\nGAUCHE", bump_left, 0xFFFFFF), ("BUMP\nDROITE", bump_right, 0xFFFFFF),
+         ("FLASH\nROUGE", flash_red, 0xE01010), ("FLASH\nBLEU", flash_blue, 0x1030E0),
+         ("FLASH\nUV", flash_uv, 0x5010B0), ("FLASH\nTÊTES", flash_heads, 0xD8D8D8)],
+     cols=5, w=106, h=88, font=BOLD, keys=L("Alt+Shift+", "KLMNOPQRST"))
 
 props = ET.SubElement(vc, "Properties")
 ET.SubElement(props, "Size", {"Width": "1920", "Height": "1080"})
